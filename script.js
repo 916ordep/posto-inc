@@ -213,7 +213,7 @@
   function dadosIniciais() {
     return {
       perfil: { nome: "Usuário", foto: "", cidade: "Cidade Exemplo", uf: "RJ", membroDesde: "março de 2026" },
-      carro: { modelo: "Hatch 1.0 Flex", placa: "BRA2E19", ano: 2022, tipo: "flex", tanque: 47, consumoCidade: 12.1, consumoEstrada: 14.3 },
+      carro: { modelo: "Hatch 1.0 Flex", ano: 2022, tipo: "flex", tanque: 47, consumoCidade: 12.1, consumoEstrada: 14.3 },
       favoritos: [8, 4],
       reclamacoes: [],
       config: {
@@ -1335,10 +1335,9 @@
         const autonomia = Number(f.tanque) * ((Number(f.consumoCidade) + Number(f.consumoEstrada)) / 2);
         return {
           html: `
-            <div class="cartao-carro">${ic("carro")}<div><b>${esc(f.modelo || "Seu carro")}</b><small>${tiposCarro[f.tipo].nome} · ${esc(f.ano)} · autonomia estimada de ${Number.isFinite(autonomia) ? Math.round(autonomia) : "—"} km</small><br><span class="placa">${esc((f.placa || "").toUpperCase())}</span></div></div>
-            <div class="a-campo"><label for="c-modelo">Modelo</label><input id="c-modelo" data-campo="modelo" value="${esc(f.modelo)}" maxlength="40"></div>
-            <div class="a-linha">
-              <div class="a-campo"><label for="c-placa">Placa</label><input id="c-placa" data-campo="placa" value="${esc(f.placa)}" maxlength="7" style="text-transform:uppercase"></div>
+            <div class="cartao-carro">${ic("carro")}<div><b>${esc(f.modelo || "Seu carro")}</b><small>${tiposCarro[f.tipo].nome} · ${esc(f.ano)} · autonomia estimada de ${Number.isFinite(autonomia) ? Math.round(autonomia) : "—"} km</small></div></div>
+            <div class="a-linha a-linha--modelo">
+              <div class="a-campo"><label for="c-modelo">Modelo</label><input id="c-modelo" data-campo="modelo" value="${esc(f.modelo)}" maxlength="40"></div>
               <div class="a-campo"><label for="c-ano">Ano</label><input id="c-ano" data-campo="ano" type="number" min="1980" max="2027" value="${esc(f.ano)}"></div>
             </div>
             <div class="a-campo"><span>Tipo de combustível</span>
@@ -1836,7 +1835,7 @@
       </div>
       <ul class="menu-lista">
         <li><button type="button" data-acao="abrir-perfil">${ic("usuario")}<span>Editar perfil<small>Nome e cidade</small></span>${ic("direita")}</button></li>
-        <li><button type="button" data-acao="abrir-carro">${ic("carro")}<span>Meu carro<small>${esc(dados.carro.modelo)} · ${esc(String(dados.carro.placa).toUpperCase())}</small></span>${ic("direita")}</button></li>
+        <li><button type="button" data-acao="abrir-carro">${ic("carro")}<span>Meu carro<small>${esc(dados.carro.modelo)} · ${tiposCarro[dados.carro.tipo].nome}</small></span>${ic("direita")}</button></li>
         <li><button type="button" data-acao="abrir-minhas">${ic("mensagem")}<span>Minhas avaliações<small>${dados.avaliacoes.length} publicadas neste aparelho</small></span>${ic("direita")}</button></li>
         <li><button type="button" data-acao="abrir-minhas-reclamacoes">${ic("megafone")}<span>Minhas reclamações<small>${dados.reclamacoes.length} registradas · denúncias à ANP e ao ${procon()}</small></span>${ic("direita")}</button></li>
         <li><button type="button" data-acao="ir-favoritos">${ic("marcador")}<span>Rotas frequentes<small>${dados.rotas.length} salvas</small></span>${ic("direita")}</button></li>
@@ -1998,7 +1997,8 @@
     "salvar-carro": () => {
       const f = estado.form;
       if (!String(f.modelo).trim()) { mostrarToast("Informe o modelo do carro."); return; }
-      dados.carro = { ...f, modelo: String(f.modelo).trim(), placa: String(f.placa).toUpperCase(), ano: Number(f.ano), tanque: Number(f.tanque) || 1, consumoCidade: Number(f.consumoCidade) || 1, consumoEstrada: Number(f.consumoEstrada) || 1 };
+      const { placa: _placaAntiga, ...carroSemPlaca } = f;
+      dados.carro = { ...carroSemPlaca, modelo: String(f.modelo).trim(), ano: Number(f.ano), tanque: Number(f.tanque) || 1, consumoCidade: Number(f.consumoCidade) || 1, consumoEstrada: Number(f.consumoEstrada) || 1 };
       const combs = tiposCarro[dados.carro.tipo].combustiveis;
       if (!combs.includes(estado.combustivel)) estado.combustivel = combs[0];
       filtroEletrico.checked = dados.carro.tipo === "eletrico";

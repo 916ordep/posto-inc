@@ -2454,17 +2454,8 @@ body.ampliado {
   font-size: .8rem;
 }
 
-.placa {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: #fff;
-  color: #000;
-  font-weight: 800;
-  font-size: .78rem;
-  letter-spacing: .08em;
-  border-top: 4px solid #1f4fbf;
+.a-linha--modelo {
+  grid-template-columns: 2fr 1fr;
 }
 
 .dica {
