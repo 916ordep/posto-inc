@@ -4223,3 +4223,13 @@ main:focus {
     grid-template-columns: 1fr;
   }
 }
+/* =========================================================
+   Foto de perfil
+   ========================================================= */
+.avatar--foto { padding: 0; overflow: hidden; background: var(--a-cinza-2); }
+.avatar--foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.foto-perfil { display: grid; justify-items: center; gap: 12px; margin: 8px 0 20px; }
+.avatar--editar { width: 96px; height: 96px; font-size: 2rem; }
+.foto-perfil__botoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.foto-perfil__botoes .a-botao { padding: 10px 14px; font-size: .88rem; }
+.oculto { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }

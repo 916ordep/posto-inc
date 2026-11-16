@@ -194,6 +194,10 @@
   const diasAtras = (n) => new Date(Date.now() - n * 86400000).toISOString();
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const iniciais = (nome) => nome.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join("");
+  // Avatar com a foto do perfil, ou com as iniciais quando não há foto
+  const avatar = (nome, foto, classe = "") => foto
+    ? `<span class="avatar avatar--foto ${classe}"><img src="${esc(foto)}" alt=""></span>`
+    : `<span class="avatar ${classe}">${iniciais(nome || "?")}</span>`;
 
   const ic = (nome, classe = "") => `<svg class="ic ${classe}" aria-hidden="true"><use href="#i-${nome}"/></svg>`;
   function estrelas(nota) {
@@ -208,7 +212,7 @@
   // =========================================================
   function dadosIniciais() {
     return {
-      perfil: { nome: "Alex Souza", cidade: "Cidade Exemplo", uf: "RJ", membroDesde: "março de 2026" },
+      perfil: { nome: "Usuário", foto: "", cidade: "Cidade Exemplo", uf: "RJ", membroDesde: "março de 2026" },
       carro: { modelo: "Hatch 1.0 Flex", placa: "BRA2E19", ano: 2022, tipo: "flex", tanque: 47, consumoCidade: 12.1, consumoEstrada: 14.3 },
       favoritos: [8, 4],
       reclamacoes: [],
@@ -237,6 +241,8 @@
     const base = dadosIniciais();
     try {
       const salvo = JSON.parse(localStorage.getItem(CHAVE_ARMAZENAMENTO) || "null");
+      // Quem já usou a demonstração com o nome antigo passa a ver "Usuário"
+      if (salvo && salvo.perfil && salvo.perfil.nome === "Alex Souza") salvo.perfil.nome = "Usuário";
       if (salvo && typeof salvo === "object") return { ...base, ...salvo, perfil: { ...base.perfil, ...salvo.perfil }, carro: { ...base.carro, ...salvo.carro }, config: { ...base.config, ...salvo.config } };
     } catch (e) { /* armazenamento indisponível */ }
     return base;
@@ -1262,7 +1268,7 @@
     const util = a.voce ? null : !!dados.uteis[a.id];
     return `<article class="avaliacao">
       <div class="avaliacao__topo">
-        <span class="avatar ${a.voce ? "avatar--voce" : ""}">${iniciais(a.autor)}</span>
+        ${avatar(a.autor, a.voce && dados.config.nomePublico ? dados.perfil.foto : "", a.voce ? "avatar--voce" : "")}
         <div class="avaliacao__autor"><b>${esc(a.autor)}${a.voce ? " (você)" : ""}</b><small>Avaliador nível ${a.nivel} · ${a.totalAutor} avaliações</small></div>
         ${a.voce ? `<button type="button" class="botao-icone" data-acao="remover-avaliacao" data-id="${a.id}" aria-label="Excluir minha avaliação">${ic("lixeira")}</button>` : ""}
       </div>
@@ -1354,6 +1360,27 @@
     };
   }
 
+  // Recorta a foto em quadrado e reduz para 256 px, para caber no armazenamento do navegador
+  function reduzirFoto(arquivo) {
+    return new Promise((resolver, rejeitar) => {
+      const leitor = new FileReader();
+      leitor.onerror = rejeitar;
+      leitor.onload = () => {
+        const img = new Image();
+        img.onerror = rejeitar;
+        img.onload = () => {
+          const lado = Math.min(img.width, img.height);
+          const tela = document.createElement("canvas");
+          tela.width = tela.height = 256;
+          tela.getContext("2d").drawImage(img, (img.width - lado) / 2, (img.height - lado) / 2, lado, lado, 0, 0, 256, 256);
+          resolver(tela.toDataURL("image/jpeg", 0.85));
+        };
+        img.src = leitor.result;
+      };
+      leitor.readAsDataURL(arquivo);
+    });
+  }
+
   function painelPerfil() {
     estado.form = { ...dados.perfil };
     return {
@@ -1362,7 +1389,14 @@
         const f = estado.form;
         return {
           html: `
-            <div style="display:grid;justify-items:center;margin:8px 0 20px"><span class="avatar avatar--grande">${iniciais(f.nome || "?")}</span></div>
+            <div class="foto-perfil">
+              ${avatar(f.nome, f.foto, "avatar--grande avatar--editar")}
+              <input type="file" id="p-foto" accept="image/*" class="oculto" tabindex="-1" aria-hidden="true">
+              <div class="foto-perfil__botoes">
+                <button type="button" class="a-botao a-botao--claro" data-acao="escolher-foto">${ic("usuario")} ${f.foto ? "Trocar foto" : "Escolher foto"}</button>
+                ${f.foto ? `<button type="button" class="a-botao a-botao--perigo" data-acao="remover-foto">${ic("lixeira")} Remover foto</button>` : ""}
+              </div>
+            </div>
             <div class="a-campo"><label for="p-nome">Nome</label><input id="p-nome" data-campo="nome" value="${esc(f.nome)}" maxlength="40"></div>
             <div class="a-linha">
               <div class="a-campo"><label for="p-cidade">Cidade</label><input id="p-cidade" data-campo="cidade" value="${esc(f.cidade)}" maxlength="40"></div>
@@ -1374,6 +1408,14 @@
       },
       aoMontar(raiz) {
         $$("[data-campo]", raiz).forEach((i) => i.addEventListener("input", () => (estado.form[i.dataset.campo] = i.value)));
+        $("#p-foto", raiz).addEventListener("change", (ev) => {
+          const arquivo = ev.target.files && ev.target.files[0];
+          if (!arquivo) return;
+          if (!arquivo.type.startsWith("image/")) { mostrarToast("Escolha um arquivo de imagem (JPG ou PNG)."); return; }
+          reduzirFoto(arquivo)
+            .then((url) => { estado.form.foto = url; atualizarPainelAtual(); })
+            .catch(() => mostrarToast("Não foi possível abrir essa imagem. Tente outra."));
+        });
       }
     };
   }
@@ -1594,7 +1636,9 @@
     ["Privacidade", "Privacy", "Privacidad"], ["Mostrar meu nome nas avaliações", "Show my name on reviews", "Mostrar mi nombre en las reseñas"],
     ["Compartilhar localização durante a viagem", "Share location during trips", "Compartir ubicación durante el viaje"],
     ["Avaliações e reclamações de outros motoristas aparecem no idioma original.", "Reviews and complaints from other drivers appear in their original language.", "Las reseñas y reclamos de otros conductores aparecen en su idioma original."],
-    ["Versão", "Version", "Versión"], ["Motorista anônimo", "Anonymous driver", "Conductor anónimo"],
+    ["Versão", "Version", "Versión"],
+    ["Escolher foto", "Choose photo", "Elegir foto"], ["Trocar foto", "Change photo", "Cambiar foto"],
+    ["Remover foto", "Remove photo", "Quitar foto"], ["Motorista anônimo", "Anonymous driver", "Conductor anónimo"],
     ["Preço confere com o app", "Price matches the app", "El precio coincide con la app"], ["Bom atendimento", "Good service", "Buena atención"],
     ["Banheiro limpo", "Clean restroom", "Baño limpio"], ["Combustível de qualidade", "Quality fuel", "Combustible de calidad"],
     ["Carregador funcionando", "Charger working", "Cargador funcionando"], ["Loja de conveniência boa", "Good convenience store", "Buena tienda de conveniencia"],
@@ -1773,7 +1817,7 @@
     $("#vista-conta").innerHTML = `
       <div class="perfil-topo">
         <div><h2>${esc(dados.perfil.nome)}</h2><p>${ic("estrela")} Avaliador nível ${n.nivel} · ${esc(dados.perfil.cidade)} - ${esc(dados.perfil.uf)}</p></div>
-        <span class="avatar avatar--grande">${iniciais(dados.perfil.nome)}</span>
+        ${avatar(dados.perfil.nome, dados.perfil.foto, "avatar--grande")}
       </div>
       <div class="atalhos">
         <button type="button" data-acao="abrir-carro">${ic("carro")}Meu carro</button>
@@ -1961,10 +2005,12 @@
       salvar(); voltarPainel(); atualizarTudo(true); atualizarVistaAtiva();
       mostrarToast("Dados do carro salvos.");
     },
+    "escolher-foto": () => { const i = $("#p-foto"); if (i) i.click(); },
+    "remover-foto": () => { estado.form.foto = ""; atualizarPainelAtual(); },
     "salvar-perfil": () => {
       const nome = String(estado.form.nome).trim();
       if (!nome) { mostrarToast("Informe o seu nome."); return; }
-      dados.perfil = { ...dados.perfil, nome, cidade: String(estado.form.cidade).trim() || dados.perfil.cidade, uf: estado.form.uf || dados.perfil.uf };
+      dados.perfil = { ...dados.perfil, nome, foto: estado.form.foto || "", cidade: String(estado.form.cidade).trim() || dados.perfil.cidade, uf: estado.form.uf || dados.perfil.uf };
       salvar(); voltarPainel(); atualizarVistaAtiva(); atualizarTudo(true);
       mostrarToast("Perfil atualizado.");
     },
