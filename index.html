@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Posto Inc.</title>
+  <meta name="description"
+    content="Apresentação acadêmica do Posto Inc., aplicativo que traça a rota do motorista, encontra os postos no caminho e compara preços, avaliações e carregadores elétricos.">
+  <link rel="icon" href="img/icone-posto-inc.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Biblioteca de ícones (SVG) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-inicio" viewBox="0 0 24 24">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <path d="M9 22V12h6v10" />
+    </symbol>
+    <symbol id="i-coracao" viewBox="0 0 24 24">
+      <path
+        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </symbol>
+    <symbol id="i-atividade" viewBox="0 0 24 24">
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+    </symbol>
+    <symbol id="i-usuario" viewBox="0 0 24 24">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </symbol>
+    <symbol id="i-usuarios" viewBox="0 0 24 24">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </symbol>
+    <symbol id="i-busca" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8" />
+      <path d="M21 21l-4.35-4.35" />
+    </symbol>
+    <symbol id="i-inverter" viewBox="0 0 24 24">
+      <path d="M7 4v16M7 4L4 7M7 4l3 3M17 20V4M17 20l-3-3M17 20l3-3" />
+    </symbol>
+    <symbol id="i-play" viewBox="0 0 24 24">
+      <path d="M7 4l13 8-13 8z" />
+    </symbol>
+    <symbol id="i-pausa" viewBox="0 0 24 24">
+      <path d="M7 4h3v16H7zM14 4h3v16h-3z" />
+    </symbol>
+    <symbol id="i-reiniciar" viewBox="0 0 24 24">
+      <path d="M1 4v6h6" />
+      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+    </symbol>
+    <symbol id="i-estrela" viewBox="0 0 24 24">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" />
+    </symbol>
+    <symbol id="i-raio" viewBox="0 0 24 24">
+      <path d="M13 2L3 14h9l-1 8 10-12h-9z" />
+    </symbol>
+    <symbol id="i-pino" viewBox="0 0 24 24">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </symbol>
+    <symbol id="i-bandeira" viewBox="0 0 24 24">
+      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+      <path d="M4 22v-7" />
+    </symbol>
+    <symbol id="i-bomba" viewBox="0 0 24 24">
+      <path d="M3 22V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17" />
+      <path d="M2 22h14" />
+      <path d="M15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3" />
+      <path d="M6 7h6v4H6z" />
+    </symbol>
+    <symbol id="i-carro" viewBox="0 0 24 24">
+      <path
+        d="M3 13l2-5.6A2 2 0 0 1 6.9 6h10.2a2 2 0 0 1 1.9 1.4L21 13v5a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1H7v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" />
+      <path d="M3 13h18" />
+      <path d="M7 15.5h.01M17 15.5h.01" />
+    </symbol>
+    <symbol id="i-rota" viewBox="0 0 24 24">
+      <circle cx="6" cy="19" r="3" />
+      <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
+      <circle cx="18" cy="5" r="3" />
+    </symbol>
+    <symbol id="i-direita" viewBox="0 0 24 24">
+      <path d="M9 18l6-6-6-6" />
+    </symbol>
+    <symbol id="i-esquerda" viewBox="0 0 24 24">
+      <path d="M15 18l-6-6 6-6" />
+    </symbol>
+    <symbol id="i-mais" viewBox="0 0 24 24">
+      <path d="M12 5v14M5 12h14" />
+    </symbol>
+    <symbol id="i-relogio" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 6v6l4 2" />
+    </symbol>
+    <symbol id="i-curtir" viewBox="0 0 24 24">
+      <path
+        d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+    </symbol>
+    <symbol id="i-editar" viewBox="0 0 24 24">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z" />
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="M20 6L9 17l-5-5" />
+    </symbol>
+    <symbol id="i-fechar" viewBox="0 0 24 24">
+      <path d="M18 6L6 18M6 6l12 12" />
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4M12 8h.01" />
+    </symbol>
+    <symbol id="i-lixeira" viewBox="0 0 24 24">
+      <path d="M3 6h18" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6M14 11v6" />
+      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+    </symbol>
+    <symbol id="i-ampliar" viewBox="0 0 24 24">
+      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+    </symbol>
+    <symbol id="i-dinheiro" viewBox="0 0 24 24">
+      <path d="M12 1v22" />
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    </symbol>
+    <symbol id="i-queda" viewBox="0 0 24 24">
+      <path d="M23 18l-9.5-9.5-5 5L1 6" />
+      <path d="M17 18h6v-6" />
+    </symbol>
+    <symbol id="i-celular" viewBox="0 0 24 24">
+      <rect x="5" y="2" width="14" height="20" rx="2" />
+      <path d="M12 18h.01" />
+    </symbol>
+    <symbol id="i-marcador" viewBox="0 0 24 24">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+    </symbol>
+    <symbol id="i-navegar" viewBox="0 0 24 24">
+      <path d="M3 11l19-9-9 19-2-8z" />
+    </symbol>
+    <symbol id="i-mensagem" viewBox="0 0 24 24">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </symbol>
+    <symbol id="i-gota" viewBox="0 0 24 24">
+      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+    </symbol>
+    <symbol id="i-escudo" viewBox="0 0 24 24">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </symbol>
+    <symbol id="i-bussola" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36z" />
+    </symbol>
+    <symbol id="i-codigo" viewBox="0 0 24 24">
+      <path d="M16 18l6-6-6-6M8 6l-6 6 6 6" />
+    </symbol>
+    <symbol id="i-banco" viewBox="0 0 24 24">
+      <ellipse cx="12" cy="5" rx="9" ry="3" />
+      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+    </symbol>
+    <symbol id="i-regua" viewBox="0 0 24 24">
+      <path
+        d="M21.3 8.7L8.7 21.3a1 1 0 0 1-1.4 0l-4.6-4.6a1 1 0 0 1 0-1.4L15.3 2.7a1 1 0 0 1 1.4 0l4.6 4.6a1 1 0 0 1 0 1.4z" />
+      <path d="M7.5 10.5l2 2M10.5 7.5l2 2M13.5 4.5l2 2M4.5 13.5l2 2" />
+    </symbol>
+    <symbol id="i-sair" viewBox="0 0 24 24">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+    </symbol>
+    <symbol id="i-alerta" viewBox="0 0 24 24">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+      <path d="M12 9v4M12 17h.01" />
+    </symbol>
+    <symbol id="i-megafone" viewBox="0 0 24 24">
+      <path d="M3 11v2a1 1 0 0 0 1 1h2l6 4V6L6 10H4a1 1 0 0 0-1 1z" />
+      <path d="M16 8.5a5 5 0 0 1 0 7M19.5 5a10 10 0 0 1 0 14" />
+    </symbol>
+    <symbol id="i-documento" viewBox="0 0 24 24">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+    </symbol>
+    <symbol id="i-ajustes" viewBox="0 0 24 24">
+      <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
+    </symbol>
+    <symbol id="i-globo" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </symbol>
+    <symbol id="i-lua" viewBox="0 0 24 24">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </symbol>
+    <symbol id="i-alvo" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+    </symbol>
+  </svg>
+
+  <div class="progresso" aria-hidden="true"><span id="barra-progresso"></span></div>
+
+  <!-- Cabeçalho -->
+  <header class="topo">
+    <div class="container topo__conteudo">
+      <a href="#capa" class="logo" aria-label="Posto Inc. — capa">
+        <img src="img/logo-posto-inc-ouro.png" alt="Posto Inc.">
+      </a>
+      <button class="menu-botao" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="menu" class="menu">
+        <a href="#introducao">Introdução</a>
+        <a href="#objetivos">Objetivos</a>
+        <a href="#identidade">Identidade</a>
+        <a href="#funcionalidades">Funcionalidades</a>
+        <a href="#comunidade">Comunidade</a>
+        <a href="#alertas">Alertas</a>
+        <a href="#prototipo">Protótipo</a>
+        <a href="#tecnologias">Tecnologias</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo" tabindex="-1">
+    <!-- ===== Capa ===== -->
+    <section id="capa" class="slide capa">
+      <div class="container capa__grade">
+        <div>
+          <span class="selo">Apresentação de projeto acadêmico</span>
+          <h1 class="capa__titulo"><span class="ouro">Posto</span> Inc.</h1>
+          <p class="capa__subtitulo">Mobilidade urbana: o aplicativo que encontra o posto mais barato e confiável no
+            seu trajeto pela cidade</p>
+          <dl class="ficha">
+            <div>
+              <dt>Disciplina</dt>
+              <dd>Práticas Extensionistas</dd>
+            </div>
+            <div>
+              <dt>Equipe</dt>
+              <dd>Pedro Henrique Oliveira · Julio Felix · Gabriel Blanc · Ramon Francisco · Samuel Eduardo</dd>
+            </div>
+            <div>
+              <dt>Orientador(a)</dt>
+              <dd>Prof.(a) Isabel Cristina Silva Valentim</dd>
+            </div>
+            <div>
+              <dt>Instituição</dt>
+              <dd>Universidade de Vassouras — <span class="ano-atual"></span></dd>
+            </div>
+          </dl>
+          <div class="capa__acoes">
+            <a href="#introducao" class="botao">Iniciar apresentação</a>
+            <a href="#prototipo" class="botao botao--contorno">Ir direto ao protótipo</a>
+          </div>
+        </div>
+
+        <div class="celular celular--capa" aria-hidden="true">
+          <div class="celular__entalhe"></div>
+          <div class="celular__tela abertura">
+            <img src="img/icone-posto-inc.png" alt="" class="abertura__icone">
+            <img src="img/logo-posto-inc-preto.png" alt="" class="abertura__logo">
+            <p>Encontre o melhor posto<br>no seu caminho</p>
+            <span class="abertura__carregando"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 1. Introdução ===== -->
+    <section id="introducao" class="slide">
+      <div class="container">
+        <header class="slide__cabecalho">
+          <span class="slide__numero">01</span>
+          <h2>Introdução</h2>
+        </header>
+        <div class="duas-colunas">
+          <div class="texto">
+            <p>O preço dos combustíveis varia de um posto para outro, inclusive entre estabelecimentos de uma mesma
+              cidade
+              e de um mesmo trajeto. Na prática, porém, o motorista raramente tem essas informações à mão no momento
+              em que precisa abastecer.</p>
+            <p>Na cidade, isso tem um custo coletivo: cada volta extra atrás de um posto mais barato coloca mais carros
+              nas ruas, aumenta o <strong>congestionamento</strong> e as <strong>emissões de poluentes</strong>. Além
+              disso, o combustível adulterado prejudica o consumidor e os veículos que circulam pela cidade.</p>
+            <p>Ao mesmo tempo, cresce o número de veículos elétricos e híbridos, cujos donos precisam saber
+              <strong>onde existem pontos de recarga</strong> ao longo do caminho.
+            </p>
+            <p>O <strong class="ouro">Posto Inc.</strong> reúne essas informações em um só lugar: o aplicativo funciona
+              como um GPS e, durante o trajeto, mostra quais postos estão mais baratos, quais são os mais bem avaliados
+              pela comunidade de motoristas e quais têm carregador para carro elétrico.</p>
+          </div>
+          <div class="cartoes-info">
+            <div class="cartao-info"><svg class="ic">
+                <use href="#i-bomba" />
+              </svg>
+              <div><b>Preços diferentes</b>
+                <p>Postos próximos podem praticar valores bem distintos.</p>
+              </div>
+            </div>
+            <div class="cartao-info"><svg class="ic">
+                <use href="#i-bussola" />
+              </svg>
+              <div><b>Decisão em movimento</b>
+                <p>A escolha do posto costuma ser feita durante a viagem.</p>
+              </div>
+            </div>
+            <div class="cartao-info"><svg class="ic">
+                <use href="#i-raio" />
+              </svg>
+              <div><b>Mobilidade elétrica</b>
+                <p>Motoristas de veículos elétricos precisam localizar carregadores.</p>
+              </div>
+            </div>
+            <div class="cartao-info"><svg class="ic">
+                <use href="#i-rota" />
+              </svg>
+              <div><b>Impacto na cidade</b>
+                <p>Menos voltas atrás de posto significam menos trânsito e menos poluição nas ruas.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 2. Problema ===== -->
+    <section id="problema" class="slide slide--alternado">
+      <div class="container">
+        <header class="slide__cabecalho">
+          <span class="slide__numero">02</span>
+          <h2>Problema de pesquisa</h2>
+        </header>
+        <blockquote class="pergunta">
+          Como ajudar o motorista a escolher, <em>sem sair do seu trajeto pela cidade</em>, o posto de combustível que
+          oferece o melhor equilíbrio entre preço, qualidade e serviços?
+        </blockquote>
+        <div class="grade-3">
+          <article class="cartao">
+            <h3>Falta de informação</h3>
+            <p>O motorista não sabe o preço praticado pelos postos que estão à frente no caminho.</p>
+          </article>
+          <article class="cartao">
+            <h3>Desvios desnecessários</h3>
+            <p>Procurar um posto mais barato fora da rota consome tempo e combustível e aumenta o trânsito e as emissões
+              na cidade.</p>
+          </article>
+          <article class="cartao">
+            <h3>Pouca confiança</h3>
+            <p>Avaliações genéricas não dizem se o preço anunciado confere ou se o carregador está funcionando.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 3. Objetivos ===== -->
+    <section id="objetivos" class="slide">
+      <div class="container">
+        <header class="slide__cabecalho">
+          <span class="slide__numero">03</span>
+          <h2>Objetivos</h2>
+        </header>
+        <div class="duas-colunas">
+          <div class="objetivo-geral">
+            <h3>Objetivo geral</h3>
+            <p>Desenvolver um aplicativo de mobilidade urbana que trace a rota do motorista pela cidade, identifique os
+              postos de combustível existentes no trajeto e compare seus preços, avaliações e serviços, informando a
+              distância do usuário até cada posto.</p>
+          </div>
+          <div>
+            <h3>Objetivos específicos</h3>
+            <ul class="lista-check">
+              <li>Calcular o menor caminho entre o ponto de partida e o destino.</li>
+              <li>Identificar os postos ao longo da rota e a distância do usuário até cada um.</li>
+              <li>Comparar os preços por tipo de combustível e indicar os carregadores elétricos.</li>
+              <li>Criar um sistema próprio de avaliação, feito de usuário para usuário.</li>
+              <li>Sinalizar postos com denúncias de combustível adulterado (ANP e Procon) e receber reclamações.</li>
+              <li>Permitir o cadastro do veículo e o controle do consumo de combustível.</li>
+              <li>Salvar postos favoritos e rotas frequentes.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 4. Identidade visual ===== -->
+    <section id="identidade" class="slide slide--alternado">
+      <div class="container">
+        <header class="slide__cabecalho">
+          <span class="slide__numero">04</span>
+          <h2>Identidade visual</h2>
+        </header>
+        <div class="identidade">
+          <div class="identidade__marca">
+            <div class="identidade__logo">
+              <img src="img/logo-posto-inc.png"
+                alt="Logomarca do Posto Inc.: a letra P com um bico de bomba de combustível e uma gota, seguida da palavra osto e de INC.">
+            </div>
+            <h3>Conceito da marca</h3>
+            <p>O “P” de <strong>Posto</strong> ganha um bico de bomba de combustível e uma gota: a letra vira o próprio
+              ato de abastecer. O dourado representa valor e economia; o preto transmite sobriedade e confiança,
+              qualidades de um serviço que protege o motorista da cidade.</p>
+            <div class="variacoes">
+              <figure class="variacao">
+                <img src="img/icone-posto-inc.png"
+                  alt="Ícone do aplicativo: a letra P com bico e gota sobre fundo dourado" class="variacao__icone">
+                <figcaption>Ícone do aplicativo</figcaption>
+              </figure>
+              <figure class="variacao">
+                <span class="variacao__fundo"><img src="img/logo-posto-inc-ouro.png"
+                    alt="Versão da logomarca em dourado sobre fundo preto"></span>
+                <figcaption>Versão para fundos escuros</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="identidade__sistema">
+            <h3>Paleta de cores</h3>
+            <ul class="paleta">
+              <li><span class="amostra" style="--c:#C9A227"></span><b>Dourado da marca</b><small>#C9A227 · logomarca,
+                  títulos e botões · 8,7:1 com texto preto</small></li>
+              <li><span class="amostra" style="--c:#0D0D0D"></span><b>Preto da marca</b><small>#0D0D0D · letras da
+                  logomarca e fundos</small></li>
+              <li><span class="amostra" style="--c:#ECECEC"></span><b>Texto claro</b><small>#ECECEC · 16,8:1 sobre o
+                  preto</small></li>
+              <li><span class="amostra" style="--c:#0B7A3E"></span><b>Verde</b><small>#0B7A3E · posto mais barato ·
+                  5,4:1 com texto branco</small></li>
+              <li><span class="amostra" style="--c:#C8102E"></span><b>Vermelho</b><small>#C8102E · alerta de
+                  adulteração · 5,9:1 com texto branco</small></li>
+              <li><span class="amostra" style="--c:#E0A100"></span><b>Âmbar</b><small>#E0A100 · denúncia em
+                  apuração</small></li>
+            </ul>
+            <h3>Tipografia</h3>
+            <div class="tipos">
+              <div class="tipo tipo--titulo"><span class="tipo__amostra" aria-hidden="true">Aa</span>
+                <div><b>Montserrat</b><small>Títulos. Geométrica, no mesmo estilo das letras da logomarca.</small></div>
+              </div>
+              <div class="tipo tipo--texto"><span class="tipo__amostra" aria-hidden="true">Aa</span>
+                <div><b>Lexend</b><small>Textos da apresentação. Fonte criada para facilitar a leitura.</small></div>
+              </div>
+              <div class="tipo tipo--app"><span class="tipo__amostra" aria-hidden="true">Aa</span>
+                <div><b>Outfit</b><small>Interface do aplicativo. Compacta e legível em telas pequenas.</small></div>
+              </div>
+            </div>
+            <p class="nota-rodape">As combinações de texto e fundo seguem o contraste mínimo de 4,5:1 da WCAG 2.1
+              (nível AA).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 5. Funcionalidades ===== -->
+    <section id="funcionalidades" class="slide">
+      <div class="container">
+        <header class="slide__cabecalho">
+          <span class="slide__numero">05</span>
+          <h2>Funcionalidades do aplicativo</h2>
+        </header>
+        <div class="grade-3 grade-3--compacta">
+          <article class="cartao cartao--icone"><svg class="ic">
+              <use href="#i-navegar" />
+            </svg>
+            <h3>Rota como GPS</h3>
+            <p>Traça o caminho de carro e acompanha o motorista em tempo real.</p>
+          </article>
+          <article class="cartao cartao--icone"><svg class="ic">
+              <use href="#i-pino" />
+            </svg>
+            <h3>Postos no caminho</h3>
+            <p>Identifica os postos do trajeto, a distância até cada um e entre eles.</p>
+          </article>
+          <article class="cartao cartao--icone"><svg class="ic">
+              <use href="#i-dinheiro" />
+            </svg>
+            <h3>Comparação de preços</h3>
+            <p>Gasolina comum, gasolina aditivada, etanol, diesel e recarga elétrica.</p>
+          </article>
+          <article class="cartao cartao--icone"><svg class="ic">
+              <use href="#i-usuarios" />
+            </svg>
+            <h3>Avaliação comunitária</h3>
+            <p>Notas e comentários feitos de usuário para usuário, dentro do próprio app.</p>
+          </article>
+          <article class="cartao cartao--icone"><svg class="ic">
+              <use href="#i-coracao" />
+            </svg>
+            <h3>Favoritos</h3>
+            <p>Postos favoritos e rotas frequentes salvos para quem repete o trajeto.</p>
+          </article>
+          <article class="cartao cartao--icone"><svg class="ic">
+              <use href="#i-alerta" />
+            </svg>
+            <h3>Alerta de adulteração</h3>
+            <p>Sinaliza postos com denúncias na ANP e no Procon e recebe reclamações dos motoristas.</p>
+          </article>
+          <article class="cartao cartao--icone"><svg class="ic">
+              <use href="#i-carro" />
+            </svg>
+            <h3>Meu carro</h3>
+            <p>Cadastro do veículo, do tanque e do consumo médio para estimar o custo da viagem.</p>
+          </article>
+          <article class="cartao cartao--icone"><svg class="ic">
+              <use href="#i-atividade" />
+            </svg>
+            <h3>Controle de consumo</h3>
+            <p>Histórico de abastecimentos, consumo real em km/L e gasto mensal.</p>
+          </article>
+          <article class="cartao cartao--icone"><svg class="ic">
+              <use href="#i-usuario" />
+            </svg>
+            <h3>Perfil do motorista</h3>
+            <p>Dados do usuário, reputação como avaliador e histórico de avaliações.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 6. Comunidade ===== -->
+    <section id="comunidade" class="slide slide--alternado">
+      <div class="container">
+        <header class="slide__cabecalho">
+          <span class="slide__numero">06</span>
+          <h2>Sistema de avaliação comunitária</h2>
+        </header>
+        <div class="duas-colunas">
+          <div class="texto">
+            <p>Em vez de depender de avaliações de serviços externos, o <strong class="ouro">Posto Inc.</strong> tem um
+              sistema próprio, em que <strong>motoristas avaliam os postos para outros motoristas</strong>.</p>
+            <p>Cada avaliação traz uma nota de 1 a 5 estrelas, um comentário e marcadores objetivos, como
+              “preço confere com o app” e “carregador funcionando”. Os demais usuários indicam se a avaliação foi útil,
+              o que aumenta a reputação de quem avaliou.</p>
+          </div>
+          <ol class="etapas-comunidade">
+            <li><b>Abastece</b><span>O motorista para em um posto encontrado pelo app.</span></li>
+            <li><b>Avalia</b><span>Dá a nota, escolhe marcadores e escreve um comentário.</span></li>
+            <li><b>Confirma o preço</b><span>Informa se o preço exibido no app estava correto.</span></li>
+            <li><b>Ganha reputação</b><span>Votos de “útil” elevam o nível do avaliador na comunidade.</span></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 7. Alertas de adulteração ===== -->
+    <section id="alertas" class="slide">
+      <div class="container">
+        <header class="slide__cabecalho">
+          <span class="slide__numero">07</span>
+          <h2>Alerta de adulteração e reclamações</h2>
+        </header>
+        <div class="duas-colunas">
+          <div>
+            <p class="texto-medio">Combustível adulterado prejudica o motor e o bolso do motorista. O <strong
+                class="ouro">Posto Inc.</strong>
+              reúne, em um espaço de reclamações dentro do app, três fontes de informação sobre cada posto:</p>
+            <ul class="fontes">
+              <li><b>ANP</b><span>Fiscalizações, autuações e interdições por combustível fora das especificações.</span>
+              </li>
+              <li><b>Procon do estado do usuário</b><span>Reclamações de consumidores registradas no órgão
+                  estadual.</span></li>
+              <li><b>Comunidade Posto Inc.</b><span>Reclamações dos motoristas, com resposta do posto e índice de
+                  solução.</span></li>
+            </ul>
+            <h3>Níveis de sinalização</h3>
+            <ul class="niveis">
+              <li class="niveis--grave"><b>Alerta de adulteração</b><span>Autuação ou interdição pela ANP por
+                  combustível fora das especificações nos últimos 12 meses. O posto sai da recomendação de mais
+                  barato.</span></li>
+              <li class="niveis--atencao"><b>Denúncia em apuração</b><span>Denúncia na ANP ou reclamações no Procon
+                  ainda sem conclusão.</span></li>
+              <li class="niveis--ok"><b>Sem ocorrências</b><span>Nenhum registro oficial no período.</span></li>
+            </ul>
+            <p class="nota-rodape">Para não acusar sem provas, o app sempre mostra a fonte, a data e a situação de cada
+              ocorrência e usa os termos “suspeita” e “em apuração” até a conclusão da fiscalização.</p>
+          </div>
+
+          <!-- Exemplo de sinalização -->
+          <div class="exemplo">
+            <span class="exemplo__rotulo">Exemplo de sinalização no aplicativo</span>
+            <div class="app app--mock">
+              <div class="exemplo__mapa" aria-hidden="true">
+                <svg viewBox="0 0 300 120">
+                  <rect width="300" height="120" fill="#eef0f1" />
+                  <path d="M-10 90 L120 60 L310 30" stroke="#d6dadd" stroke-width="22" fill="none"
+                    stroke-linecap="round" />
+                  <path d="M-10 90 L120 60 L310 30" stroke="#fff" stroke-width="16" fill="none"
+                    stroke-linecap="round" />
+                  <path d="M-10 90 L120 60 L310 30" stroke="#000" stroke-width="7" fill="none" stroke-linecap="round" />
+                  <g transform="translate(120 60)">
+                    <circle r="15" fill="#fff" stroke="#000" stroke-width="3.5" />
+                    <text text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="800">2</text>
+                    <g transform="translate(13 13)">
+                      <path d="M0 -10 L10 7 H-10 Z" fill="#c8102e" stroke="#fff" stroke-width="2.5"
+                        stroke-linejoin="round" />
+                      <path d="M0 -4 V1" stroke="#fff" stroke-width="2.2" stroke-linecap="round" />
+                      <circle cy="4" r="1.3" fill="#fff" />
+                    </g>
+                  </g>
+                  <g transform="translate(240 38)">
+                    <circle r="15" fill="#0b7a3e" stroke="#fff" stroke-width="3.5" />
+                    <text text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="800"
+                      fill="#fff">3</text>
+                  </g>
+                </svg>
+              </div>
+              <div class="faixa-alerta faixa-alerta--estatica">
+                <svg class="ic">
+                  <use href="#i-alerta" />
+                </svg>
+                <span><b>Posto Trevo tem alerta de adulteração</b><small>Fonte: ANP · fora da recomendação de mais
+                    barato</small></span>
+              </div>
+              <div class="item-posto item-posto--alerta">
+                <span class="item-posto__num">2</span>
+                <div>
+                  <div class="item-posto__nome">Posto Trevo</div>
+                  <div class="item-posto__info"><b>3,2 km</b> de você · 5 min</div>
+                  <div class="item-posto__selos"><span class="selo-app selo-app--alerta"><svg class="ic">
+                        <use href="#i-alerta" />
+                      </svg>Alerta de adulteração</span></div>
+                </div>
+                <div class="item-posto__preco"><b>R$ 5,64</b><small>por L</small></div>
+              </div>
+              <div class="alerta-card alerta-card--grave">
+                <span class="alerta-card__icone"><svg class="ic">
+                    <use href="#i-alerta" />
+                  </svg></span>
+                <div>
+                  <b>Histórico de combustível adulterado</b>
+                  <p>Amostra coletada pela fiscalização com teor de etanol anidro acima do limite permitido.</p>
+                  <small>Fonte: ANP · Autuado há 1 mês</small>
+                </div>
+              </div>
+              <div class="alerta-card alerta-card--atencao">
+                <span class="alerta-card__icone"><svg class="ic">
+                    <use href="#i-alerta" />
+                  </svg></span>
+                <div>
+                  <b>Denúncia em apuração</b>
+                  <p>Consumidores relatam volume abastecido menor que o cobrado.</p>
+                  <small>Fonte: Procon-RJ · Em apuração há 9 dias · ainda sem conclusão da fiscalização</small>
+                </div>
+              </div>
+            </div>
+            <p class="nota-rodape">Postos, órgãos consultados e ocorrências fictícios, apenas para demonstração.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 8. Fluxo ===== -->
+    <section id="fluxo" class="slide slide--alternado">
+      <div class="container">
+        <header class="slide__cabecalho">
+          <span class="slide__numero">08</span>
+          <h2>Fluxo de funcionamento</h2>
+        </header>
+        <ol class="fluxo">
+          <li><b>Entrada</b><span>O usuário informa partida, destino e combustível do seu carro.</span></li>
+          <li><b>Cálculo da rota</b><span>O algoritmo de Dijkstra encontra o menor caminho.</span></li>
+          <li><b>Identificação</b><span>São selecionados os postos que ficam sobre o trajeto.</span></li>
+          <li><b>Comparação</b><span>Preços, avaliações da comunidade e carregadores são comparados.</span></li>
+          <li><b>Resultado</b><span>O app mostra os melhores postos, as distâncias e o custo da viagem.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===== 9. Protótipo ===== -->
+    <section id="prototipo" class="slide">
+      <div class="container">
+        <header class="slide__cabecalho">
+          <span class="slide__numero">09</span>
+          <h2>Protótipo funcional</h2>
+        </header>
+
+        <div class="prototipo">
+          <div class="prototipo__celular">
+            <div class="celular celular--app" id="celular-app">
+              <div class="celular__entalhe"></div>
+              <div class="celular__tela app" id="app">
+                <div class="app__status">
+                  <span class="app__hora">9:41</span>
+                  <span class="app__sinais"><i></i><i></i><i></i><i></i><b>5G</b><span class="bateria"></span></span>
+                </div>
+
+                <div class="app__corpo">
+                  <!-- Início: mapa + painel inferior -->
+                  <section class="vista ativa" data-vista="inicio">
+                    <div class="mapa-area">
+                      <svg id="mapa" preserveAspectRatio="xMidYMid meet" role="group"
+                        aria-label="Mapa fictício com a rota e os postos"></svg>
+                    </div>
+
+                    <button type="button" class="busca" id="busca">
+                      <span class="busca__icone"><svg class="ic">
+                          <use href="#i-busca" />
+                        </svg></span>
+                      <span class="busca__texto"><b id="busca-titulo">Ponto A → Ponto B</b><small
+                          id="busca-sub">Gasolina comum</small></span>
+                      <svg class="ic busca__seta">
+                        <use href="#i-direita" />
+                      </svg>
+                    </button>
+
+                    <div class="nav-banner" id="nav-banner" hidden></div>
+
+                    <div class="mapa-botoes">
+                      <button type="button" class="botao-redondo botao-redondo--escuro" id="btn-viagem"
+                        aria-label="Iniciar viagem"><svg class="ic ic--cheio">
+                          <use href="#i-play" />
+                        </svg></button>
+                      <button type="button" class="botao-redondo" id="btn-reiniciar" aria-label="Reiniciar viagem"><svg
+                          class="ic">
+                          <use href="#i-reiniciar" />
+                        </svg></button>
+                    </div>
+
+                    <div class="folha" id="folha">
+                      <button type="button" class="folha__alca" id="folha-alca" aria-expanded="false"
+                        aria-controls="lista-postos"
+                        aria-label="Expandir ou recolher a lista de postos"><span></span></button>
+                      <div class="folha__conteudo">
+                        <div class="folha__cabecalho" id="folha-cabecalho"></div>
+                        <div id="faixa-alerta"></div>
+                        <div class="destaques" id="destaques"></div>
+                        <div class="folha__lista">
+                          <div class="chips" role="group" aria-label="Ordenar postos">
+                            <button type="button" class="chip ativa" data-ordem="rota" aria-pressed="true">Na
+                              rota</button>
+                            <button type="button" class="chip" data-ordem="preco">Mais baratos</button>
+                            <button type="button" class="chip" data-ordem="avaliacao">Mais bem avaliados</button>
+                            <button type="button" class="chip" data-ordem="distancia">Mais próximos</button>
+                          </div>
+                          <label class="alternador">
+                            <span>Somente com carregador elétrico</span>
+                            <input type="checkbox" id="filtro-eletrico"><i></i>
+                          </label>
+                          <label class="alternador">
+                            <span>Ocultar postos com alerta de adulteração</span>
+                            <input type="checkbox" id="filtro-alerta"><i></i>
+                          </label>
+                          <div class="lista-postos" id="lista-postos"></div>
+                          <div class="distancias" id="distancias"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="vista" data-vista="favoritos">
+                    <div class="vista__rolagem" id="vista-favoritos"></div>
+                  </section>
+                  <section class="vista" data-vista="alertas">
+                    <div class="vista__rolagem" id="vista-alertas"></div>
+                  </section>
+                  <section class="vista" data-vista="atividade">
+                    <div class="vista__rolagem" id="vista-atividade"></div>
+                  </section>
+                  <section class="vista" data-vista="conta">
+                    <div class="vista__rolagem" id="vista-conta"></div>
+                  </section>
+
+                  <!-- Telas secundárias (detalhe do posto, avaliação, carro etc.) -->
+                  <section class="painel-app" id="painel-app" aria-hidden="true">
+                    <header class="painel-app__topo">
+                      <button type="button" class="botao-icone" id="painel-voltar" aria-label="Voltar"><svg class="ic">
+                          <use href="#i-esquerda" />
+                        </svg></button>
+                      <h3 id="painel-titulo"></h3>
+                      <div id="painel-acao"></div>
+                    </header>
+                    <div class="painel-app__conteudo" id="painel-conteudo"></div>
+                    <div class="painel-app__rodape" id="painel-rodape"></div>
+                  </section>
+                </div>
+
+                <nav class="app__abas" aria-label="Navegação do aplicativo">
+                  <button type="button" class="app__aba ativa" data-ir="inicio" aria-current="page"><svg class="ic">
+                      <use href="#i-inicio" />
+                    </svg>Início</button>
+                  <button type="button" class="app__aba" data-ir="favoritos"><svg class="ic">
+                      <use href="#i-coracao" />
+                    </svg>Favoritos</button>
+                  <button type="button" class="app__aba" data-ir="alertas"><svg class="ic">
+                      <use href="#i-alerta" />
+                    </svg>Alertas</button>
+                  <button type="button" class="app__aba" data-ir="atividade"><svg class="ic">
+                      <use href="#i-atividade" />
+                    </svg>Consumo</button>
+                  <button type="button" class="app__aba" data-ir="conta"><svg class="ic">
+                      <use href="#i-usuario" />
+                    </svg>Conta</button>
+                </nav>
+
+                <div class="toast" id="toast" role="status" aria-live="polite"></div>
+                <div class="dialogo" id="dialogo" hidden>
+                  <div class="dialogo__caixa" role="alertdialog" aria-modal="true" aria-labelledby="dialogo-titulo"
+                    id="dialogo-conteudo"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Explicação ao lado do celular -->
+          <div class="prototipo__explicacao">
+            <p class="aviso">Interaja com o celular. Os pontos (de A a F), os postos, os preços, os usuários e as
+              avaliações são <strong>fictícios</strong>. Os dados que você cadastrar ficam salvos apenas neste
+              navegador.</p>
+            <ol class="roteiro">
+              <li data-acao="inicio"><b>Rota e postos no caminho</b><span>Toque na barra de busca para escolher o
+                  trajeto. Arraste o painel para ver a lista e use o botão de reprodução para simular a viagem.</span>
+              </li>
+              <li data-acao="posto"><b>Detalhes e avaliações</b><span>Abra um posto para ver preços, serviços e as
+                  avaliações feitas por outros motoristas. Publique a sua.</span></li>
+              <li data-acao="alertas"><b>Alertas e reclamações</b><span>Veja os postos com denúncias na ANP e no Procon
+                  do seu estado, a reputação de cada um e registre uma reclamação.</span></li>
+              <li data-acao="favoritos"><b>Favoritos e rotas frequentes</b><span>Salve os postos e os trajetos que você
+                  repete no dia a dia.</span></li>
+              <li data-acao="atividade"><b>Consumo de combustível</b><span>Registre abastecimentos e acompanhe o consumo
+                  real e o gasto do mês.</span></li>
+              <li data-acao="carro"><b>Perfil e meu carro</b><span>Cadastre o veículo, o tanque e o consumo médio para
+                  estimar o custo da viagem.</span></li>
+              <li data-acao="config"><b>Configurações</b><span>Ative o modo escuro, troque o idioma (português, inglês
+                  ou
+                  espanhol), aumente o texto e escolha as notificações.</span></li>
+            </ol>
+            <button type="button" class="botao" id="btn-ampliar"><svg class="ic">
+                <use href="#i-ampliar" />
+              </svg>Ampliar protótipo</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 9. Tecnologias ===== -->
+    <section id="tecnologias" class="slide slide--alternado">
+      <div class="container">
+        <header class="slide__cabecalho">
+          <span class="slide__numero">10</span>
+          <h2>Tecnologias e metodologia</h2>
+        </header>
+        <div class="duas-colunas">
+          <div>
+            <h3>Protótipo apresentado</h3>
+            <ul class="tags">
+              <li>HTML5</li>
+              <li>CSS3</li>
+              <li>JavaScript</li>
+              <li>SVG</li>
+              <li>localStorage</li>
+            </ul>
+            <p>O protótipo roda diretamente no navegador. O mapa é um grafo fictício: os pontos e cruzamentos são
+              vértices, e as ruas são arestas com peso igual ao comprimento. Perfil, carro, favoritos, abastecimentos
+              e avaliações são gravados no armazenamento local do navegador.</p>
+            <h3>Algoritmo de Dijkstra</h3>
+            <p>Para encontrar o menor caminho entre a partida e o destino, foi utilizado o algoritmo de Dijkstra.
+              Os postos localizados nas arestas desse caminho são selecionados, e a distância até cada um é medida
+              ao longo do trajeto, e não em linha reta.</p>
+          </div>
+          <div>
+            <h3>Proposta para a versão final</h3>
+            <ul class="lista-check">
+              <li>Aplicativo multiplataforma (Android e iOS), com tecnologias como Flutter ou React Native.</li>
+              <li>Integração com serviço de mapas e geolocalização (GPS) do celular.</li>
+              <li>Preços obtidos de fontes públicas, como o levantamento da ANP, e confirmados pela comunidade.</li>
+              <li>Banco de dados em nuvem para usuários, veículos, postos, preços e avaliações.</li>
+              <li>Moderação das avaliações e sistema de reputação para evitar abusos.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Referências ===== -->
+    <section id="referencias" class="slide">
+      <div class="container container--estreito">
+        <header class="slide__cabecalho">
+          <span class="slide__numero">11</span>
+          <h2>Referências</h2>
+        </header>
+        <ul class="referencias">
+          <li>AGÊNCIA NACIONAL DO PETRÓLEO, GÁS NATURAL E BIOCOMBUSTÍVEIS (ANP). <em>Levantamento de preços de
+              combustíveis</em>. Disponível em: https://www.gov.br/anp. Acesso em: [data de acesso].</li>
+          <li>BRASIL. Lei nº 8.078, de 11 de setembro de 1990. Dispõe sobre a proteção do consumidor e dá outras
+            providências (Código de Defesa do Consumidor). <em>Diário Oficial da União</em>, Brasília, DF, 12 set. 1990.
+          </li>
+          <li>CORMEN, T. H. et al. <em>Algoritmos</em>: teoria e prática. 3. ed. Rio de Janeiro: Elsevier, 2012.</li>
+          <li>DIJKSTRA, E. W. A note on two problems in connexion with graphs. <em>Numerische Mathematik</em>, v. 1, p.
+            269-271, 1959.</li>
+          <li>MOZILLA. <em>MDN Web Docs</em>. Disponível em: https://developer.mozilla.org/pt-BR/. Acesso em: [data de
+            acesso].</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== Encerramento ===== -->
+    <section id="obrigado" class="slide encerramento">
+      <div class="container">
+        <img src="img/logo-posto-inc-ouro.png" alt="Posto Inc." class="encerramento__logo">
+        <h2>Obrigado!</h2>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <div class="container rodape__grade">
+      <div class="rodape__marca">
+        <img src="img/logo-posto-inc-ouro.png" alt="Posto Inc.">
+        <p>Abasteça no posto certo, sem sair do caminho.</p>
+      </div>
+      <nav aria-label="Aplicativo">
+        <b>Aplicativo</b>
+        <a href="#identidade">Identidade visual</a>
+        <a href="#funcionalidades">Funcionalidades</a>
+        <a href="#alertas">Alertas de adulteração</a>
+        <a href="#prototipo">Protótipo</a>
+      </nav>
+      <nav aria-label="Projeto">
+        <b>Projeto</b>
+        <a href="#introducao">Introdução</a>
+        <a href="#objetivos">Objetivos</a>
+        <a href="#tecnologias">Tecnologias</a>
+        <a href="#referencias">Referências</a>
+      </nav>
+    </div>
+    <div class="container rodape__base">
+      <p>© <span class="ano-atual"></span> Posto Inc. · Projeto acadêmico demonstrativo</p>
+      <p>Locais, postos, preços, usuários e avaliações apresentados são fictícios.</p>
+    </div>
+  </footer>
+
+  <div class="fundo-ampliado" id="fundo-ampliado" hidden>
+    <button type="button" class="fechar-ampliado" id="fechar-ampliado" aria-label="Fechar visualização ampliada"><svg
+        class="ic">
+        <use href="#i-fechar" />
+      </svg></button>
+  </div>
+
+  <!-- Controles da apresentação -->
+  <div class="controles" aria-label="Controles da apresentação">
+    <button type="button" id="slide-anterior" aria-label="Seção anterior"><svg class="ic">
+        <use href="#i-esquerda" />
+      </svg></button>
+    <span id="slide-contador">1 / 13</span>
+    <button type="button" id="slide-proximo" aria-label="Próxima seção"><svg class="ic">
+        <use href="#i-direita" />
+      </svg></button>
+    <button type="button" id="tela-cheia" aria-label="Tela cheia" title="Tela cheia (F)"><svg class="ic">
+        <use href="#i-ampliar" />
+      </svg></button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
