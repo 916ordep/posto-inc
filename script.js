@@ -754,14 +754,97 @@
     if (!emCurso) return;
     const restante = Math.max(0, estado.totalKm - estado.percorridoKm);
     const destino = pontos[estado.destino].nome;
+    const conteudo = $("#nav-banner-conteudo");
+    // Aviso recolhido: mostra só a distância, num botão pequeno que não cobre o mapa
+    banner.classList.toggle("nav-banner--compacto", !!estado.bannerCompacto);
     if (restante <= 0.001) {
-      banner.innerHTML = `${ic("bandeira")}<div><b>Você chegou ao ${destino}</b><small>Trajeto de ${fmtDistancia(estado.totalKm)} concluído</small></div>`;
+      conteudo.innerHTML = estado.bannerCompacto
+        ? `${ic("bandeira")}<b>Chegou</b>`
+        : `${ic("bandeira")}<div><b>Você chegou ao ${destino}</b><small>Trajeto de ${fmtDistancia(estado.totalKm)} concluído</small></div>`;
       return;
     }
     const alvo = estado.paradaAlvo !== null ? a.aFrente.find((d) => d.posto.id === estado.paradaAlvo) : a.aFrente[0];
-    banner.innerHTML = alvo
+    if (estado.bannerCompacto) {
+      conteudo.innerHTML = `${ic("navegar")}<b>${fmtDistancia(alvo ? alvo.restante : restante)}</b>`;
+      return;
+    }
+    conteudo.innerHTML = alvo
       ? `${ic("navegar")}<div><b>${fmtDistancia(alvo.restante)} até ${esc(alvo.posto.nome)}</b><small>${estado.paradaAlvo !== null ? "Parada escolhida" : "Próximo posto"} · faltam ${fmtDistancia(restante)} até o ${destino} (${fmtTempo(restante)})</small></div>`
       : `${ic("navegar")}<div><b>${fmtDistancia(restante)} até o ${destino}</b><small>Não há mais postos no caminho · ${fmtTempo(restante)}</small></div>`;
+  }
+
+  // =========================================================
+  // Painel de postos com três alturas: minimizado, normal e expandido
+  // =========================================================
+  const ALTURA_FOLHA_MINIMIZADA = 96;
+  const ALTURA_FOLHA_NORMAL = 304;
+  function definirFolha(modo) {
+    folha.classList.toggle("expandida", modo === "expandida");
+    folha.classList.toggle("minimizada", modo === "minimizada");
+    folha.style.height = "";
+    // O mapa ocupa o espaço que o painel deixa livre
+    const altura = modo === "minimizada" ? ALTURA_FOLHA_MINIMIZADA : ALTURA_FOLHA_NORMAL;
+    $('.vista[data-vista="inicio"]').style.setProperty("--folha-altura", `${altura}px`);
+    $("#folha-alca").setAttribute("aria-expanded", String(modo === "expandida"));
+    $("#folha-alca").setAttribute("aria-label", modo === "minimizada" ? "Subir o painel de postos" : "Abaixar o painel de postos");
+  }
+  const modoFolha = () => folha.classList.contains("expandida") ? "expandida" : folha.classList.contains("minimizada") ? "minimizada" : "normal";
+
+  function ligarArrasteFolha() {
+    let inicio = null, ignorarClique = false;
+    const alvos = [$("#folha-alca"), $("#folha-cabecalho")];
+    const comecar = (ev) => {
+      if (ev.target.closest("[data-acao]") || (ev.button !== undefined && ev.button !== 0)) return;
+      const escala = folha.getBoundingClientRect().height / folha.offsetHeight || 1;
+      inicio = { y: ev.clientY, altura: folha.offsetHeight, escala, moveu: false };
+      folha.style.transition = "none";
+      ev.currentTarget.setPointerCapture(ev.pointerId);
+    };
+    const mover = (ev) => {
+      if (!inicio) return;
+      const dy = (ev.clientY - inicio.y) / inicio.escala;
+      if (Math.abs(dy) > 6) inicio.moveu = true;
+      if (!inicio.moveu) return;
+      const maximo = folha.parentElement.offsetHeight - 8;
+      folha.style.height = `${Math.max(ALTURA_FOLHA_MINIMIZADA, Math.min(maximo, inicio.altura - dy))}px`;
+    };
+    const soltar = () => {
+      if (!inicio) return;
+      folha.style.transition = "";
+      if (inicio.moveu) {
+        // Encaixa na altura mais próxima
+        const atual = folha.offsetHeight;
+        const maximo = folha.parentElement.offsetHeight - 8;
+        const opcoes = [["minimizada", ALTURA_FOLHA_MINIMIZADA], ["normal", ALTURA_FOLHA_NORMAL], ["expandida", maximo]];
+        opcoes.sort((x, y) => Math.abs(x[1] - atual) - Math.abs(y[1] - atual));
+        definirFolha(opcoes[0][0]);
+        ignorarClique = true;
+        setTimeout(() => (ignorarClique = false), 0);
+      }
+      inicio = null;
+    };
+    alvos.forEach((el) => {
+      el.addEventListener("pointerdown", comecar);
+      el.addEventListener("pointermove", mover);
+      el.addEventListener("pointerup", soltar);
+      el.addEventListener("pointercancel", soltar);
+    });
+    // Toque na alça: abaixa ou sobe o painel. Toque no título: abre a lista completa.
+    $("#folha-alca").addEventListener("click", () => {
+      if (ignorarClique) return;
+      definirFolha(modoFolha() === "normal" ? "minimizada" : "normal");
+    });
+    $("#folha-cabecalho").addEventListener("click", (ev) => {
+      if (ignorarClique || ev.target.closest("[data-acao]")) return;
+      definirFolha(modoFolha() === "expandida" ? "normal" : "expandida");
+    });
+    // Teclado: setas para cima e para baixo na alça
+    $("#folha-alca").addEventListener("keydown", (ev) => {
+      const ordem = ["minimizada", "normal", "expandida"];
+      const i = ordem.indexOf(modoFolha());
+      if (ev.key === "ArrowUp" && i < 2) { ev.preventDefault(); definirFolha(ordem[i + 1]); }
+      if (ev.key === "ArrowDown" && i > 0) { ev.preventDefault(); definirFolha(ordem[i - 1]); }
+    });
   }
 
   function atualizarFolha(a) {
@@ -882,7 +965,7 @@
     if (estado.percorridoKm >= estado.totalKm) estado.percorridoKm = 0;
     estado.emViagem = true;
     estado.ultimoQuadro = 0;
-    folha.classList.remove("expandida");
+    if (modoFolha() === "expandida") definirFolha("normal");
     atualizarBotaoViagem();
     requestAnimationFrame(quadro);
   }
@@ -2373,12 +2456,18 @@
     $("#painel-voltar").addEventListener("click", voltarPainel);
     $$(".app__aba", app).forEach((b) => b.addEventListener("click", () => mostrarVista(b.dataset.ir)));
 
-    const alternarFolha = () => {
-      const aberta = folha.classList.toggle("expandida");
-      $("#folha-alca").setAttribute("aria-expanded", String(aberta));
-    };
-    $("#folha-alca").addEventListener("click", alternarFolha);
-    $("#folha-cabecalho").addEventListener("click", (ev) => { if (!ev.target.closest("[data-acao]")) alternarFolha(); });
+    // Painel de postos: arrastar, tocar na alça ou no título
+    ligarArrasteFolha();
+    definirFolha("normal");
+
+    // Aviso de distância durante a viagem: recolher ou mostrar completo
+    $("#nav-banner-botao").addEventListener("click", () => {
+      estado.bannerCompacto = !estado.bannerCompacto;
+      const b = $("#nav-banner-botao");
+      b.setAttribute("aria-expanded", String(!estado.bannerCompacto));
+      b.setAttribute("aria-label", estado.bannerCompacto ? "Mostrar o aviso de distância completo" : "Recolher o aviso de distância");
+      atualizarNavegacao(analisar());
+    });
     $("#destaques").addEventListener("wheel", () => { }, { passive: true });
 
     btnViagem.addEventListener("click", () => { if (estado.emViagem) { pararViagem(); atualizarTudo(true); } else iniciarViagem(); });
@@ -2406,7 +2495,7 @@
       $$(".roteiro li").forEach((x) => x.classList.toggle("ativo", x === li));
       if (!appAberto) abrirApp(); // se o app estiver fechado, abre com a animação
       const acao = li.dataset.acao;
-      if (acao === "inicio") { mostrarVista("inicio"); folha.classList.remove("expandida"); }
+      if (acao === "inicio") { mostrarVista("inicio"); if (modoFolha() === "expandida") definirFolha("normal"); }
       else if (acao === "posto") { mostrarVista("inicio"); const a = analisar(); const d = a.maisBarato || a.lista[0]; if (d) abrirPainel(painelPosto(d.posto.id)); }
       else if (acao === "carro") { mostrarVista("conta"); abrirPainel(painelCarro()); }
       else if (acao === "config") { mostrarVista("conta"); abrirPainel(painelConfig()); }
@@ -2476,7 +2565,7 @@
     pararViagem();
     fecharDialogo();
     mostrarVista("inicio");
-    folha.classList.remove("expandida");
+    if (modoFolha() === "expandida") definirFolha("normal");
     $("#tela-inicial").hidden = false;
     appAberto = false;
     $$(".roteiro li").forEach((x) => x.classList.remove("ativo"));

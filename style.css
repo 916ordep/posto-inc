@@ -4374,3 +4374,26 @@ main:focus {
 /* As camadas internas do celular (tela inicial, abertura, painéis) ficam isoladas
    e nunca passam por cima do cabeçalho fixo do site */
 .celular { isolation: isolate; }
+
+/* =========================================================
+   Painel de postos com três alturas + aviso de distância recolhível
+   ========================================================= */
+.vista[data-vista="inicio"] { --folha-altura: 304px; }
+.mapa-area { bottom: calc(var(--folha-altura) - 18px); transition: bottom .35s cubic-bezier(.2, .8, .2, 1); }
+.mapa-botoes { bottom: calc(var(--folha-altura) - 2px); transition: bottom .35s cubic-bezier(.2, .8, .2, 1), opacity .2s; }
+.folha.minimizada { height: 96px; }
+.folha.minimizada .folha__conteudo { overflow: hidden; }
+.folha__alca, .folha__cabecalho { touch-action: none; }
+.folha__alca { cursor: grab; height: 28px; }
+.folha__alca:active { cursor: grabbing; }
+
+.nav-banner { padding-right: 8px; }
+.nav-banner__conteudo { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.nav-banner__botao { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .08); color: #f2f2f2 !important; }
+.nav-banner__botao .ic { width: 20px; height: 20px; color: #f2f2f2; transform: rotate(-90deg); transition: transform .2s; }
+.nav-banner--compacto { right: auto; padding: 6px 6px 6px 14px; border-radius: 999px; }
+.nav-banner--compacto .nav-banner__conteudo { gap: 8px; }
+.nav-banner--compacto .nav-banner__conteudo .ic { width: 20px; height: 20px; }
+.nav-banner--compacto .nav-banner__conteudo b { font-size: 1rem; }
+.nav-banner--compacto .nav-banner__botao { width: 36px; height: 36px; }
+.nav-banner--compacto .nav-banner__botao .ic { transform: rotate(90deg); }
