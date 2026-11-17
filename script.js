@@ -1633,11 +1633,20 @@
     if (!melhor) return null;
     const maisBaratoLitro = [...confiaveis].sort((x, y) => x.preco - y.preco || x.total - y.total)[0];
     const melhorNaRota = confiaveis.find((c) => c.naRota);
+    // Posto com o litro mais barato que, por causa do desvio, não é a melhor opção
+    const naoCompensa = maisBaratoLitro.posto.id !== melhor.posto.id
+      ? `O ${esc(maisBaratoLitro.posto.nome)} tem o litro ${fmtMoeda.format(melhor.preco - maisBaratoLitro.preco)} mais barato, mas o desvio de ${fmtDistancia(maisBaratoLitro.desvioKm)} custa ${fmtMoeda.format(maisBaratoLitro.custoDesvio)}. <b>Não compensa.</b>`
+      : "";
     let mensagem;
-    if (maisBaratoLitro.posto.id !== melhor.posto.id) {
-      mensagem = `O ${esc(maisBaratoLitro.posto.nome)} tem o litro ${fmtMoeda.format(melhor.preco - maisBaratoLitro.preco)} mais barato, mas o desvio de ${fmtDistancia(maisBaratoLitro.desvioKm)} custa ${fmtMoeda.format(maisBaratoLitro.custoDesvio)}. <b>Não compensa.</b>`;
-    } else if (!melhor.naRota && melhorNaRota) {
-      mensagem = `<b>Compensa</b> desviar ${fmtDistancia(melhor.desvioKm)}: economia de ${fmtMoeda.format(melhorNaRota.total - melhor.total)} em relação ao ${esc(melhorNaRota.posto.nome)}, já contando o combustível do desvio.`;
+    if (!melhor.naRota) {
+      // O melhor posto fica fora da rota: explica por que vale o desvio
+      const comparacao = melhorNaRota
+        ? `: economia de ${fmtMoeda.format(melhorNaRota.total - melhor.total)} em relação ao ${esc(melhorNaRota.posto.nome)}, o melhor do seu caminho`
+        : "";
+      mensagem = `O ${esc(melhor.posto.nome)} fica fora da rota, mas mesmo com o desvio de ${fmtDistancia(melhor.desvioKm)} (${fmtMoeda.format(melhor.custoDesvio)} de combustível) <b>compensa</b>${comparacao}.`;
+      if (naoCompensa) mensagem += ` ${naoCompensa}`;
+    } else if (naoCompensa) {
+      mensagem = naoCompensa;
     } else {
       mensagem = `O ${esc(melhor.posto.nome)} já é a opção mais econômica, sem sair do caminho.`;
     }
@@ -1652,7 +1661,7 @@
     caixa.innerHTML = `
       <button type="button" class="vale-a-pena" data-acao="abrir-vale-a-pena">
         <span class="vale-a-pena__topo">${ic("dinheiro")}<b>Vale a pena ir?</b>${ic("direita")}</span>
-        <span class="vale-a-pena__melhor">Melhor custo real: <b>${esc(r.melhor.posto.nome)}</b> · <b>${fmtMoeda.format(r.melhor.total)}</b> por ${estado.litros} ${unidade()}</span>
+        <span class="vale-a-pena__melhor">Melhor custo real: <b>${esc(r.melhor.posto.nome)}</b>${r.melhor.naRota ? "" : ` (fora da rota, desvio de ${fmtDistancia(r.melhor.desvioKm)})`} · <b>${fmtMoeda.format(r.melhor.total)}</b> por ${estado.litros} ${unidade()}</span>
         <span class="vale-a-pena__texto">${r.mensagem}</span>
       </button>`;
   }
@@ -1873,6 +1882,9 @@
     ["Vale a pena ir?", "Is it worth it?", "¿Vale la pena ir?"], ["Melhor custo real", "Best real cost", "Mejor costo real"],
     ["Custo real", "Real cost", "Costo real"], ["custo real", "real cost", "costo real"], ["Não compensa", "Not worth it", "No compensa"],
     ["Compensa", "Worth it", "Compensa"], ["Ver comparação", "See comparison", "Ver comparación"],
+    ["fora da rota", "off route", "fuera de la ruta"], ["fica fora da rota, mas mesmo com o desvio de", "is off route, but even with a detour of", "está fuera de la ruta, pero incluso con el desvío de"],
+    ["de combustível", "of fuel", "de combustible"], ["economia de", "saving", "ahorro de"], ["em relação ao", "compared to", "en comparación con"],
+    ["o melhor do seu caminho", "the best on your route", "la mejor de tu ruta"],
     ["Abastecimento", "Refueling", "Carga"], ["Desvio", "Detour", "Desvío"], ["ida e volta", "round trip", "ida y vuelta"],
     ["Comparar o custo real (Vale a pena ir?)", "Compare the real cost (Is it worth it?)", "Comparar el costo real (¿Vale la pena ir?)"],
     ["Buscar o modelo do seu carro", "Search for your car model", "Buscar el modelo de tu auto"],
