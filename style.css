@@ -4248,3 +4248,70 @@ main:focus {
 .conta-custo dt { color: var(--a-suave); }
 .conta-custo dd { margin: 0; font-weight: 600; white-space: nowrap; }
 .conta-custo__total dt, .conta-custo__total dd { color: var(--a-texto); font-weight: 800; }
+
+/* =========================================================
+   Protótipo nas cores da logomarca: dourado #C9A227 + preto #0D0D0D
+   (dourado só como fundo com texto preto, nunca como texto sobre branco)
+   ========================================================= */
+.app {
+  --a-primaria: #c9a227;
+  --a-sobre-primaria: #0d0d0d;
+  --a-barra: #0d0d0d;
+  --a-barra-suave: #a6a6a6;
+}
+
+/* Barras do celular em preto da marca, com destaque dourado */
+.app .app__status,
+.app.tema-escuro .app__status { background: var(--a-barra); color: #f2f2f2; }
+.app .app__sinais i,
+.app .bateria::before,
+.app .bateria::after,
+.app.tema-escuro .app__sinais i,
+.app.tema-escuro .bateria::before,
+.app.tema-escuro .bateria::after { background: #f2f2f2; }
+.app .bateria,
+.app.tema-escuro .bateria { border-color: #f2f2f2; }
+.app .app__abas,
+.app.tema-escuro .app__abas { background: var(--a-barra); border-top-color: var(--a-barra); }
+.app .app__aba { color: var(--a-barra-suave) !important; }
+.app .app__aba.ativa { color: var(--a-primaria) !important; }
+.app .app__aba.ativa .ic { stroke-width: 2.4; }
+
+/* Ações principais em dourado com texto preto (contraste 8,7:1) */
+.app .a-botao,
+.app.tema-escuro .a-botao { background: var(--a-primaria); color: var(--a-sobre-primaria) !important; }
+.app .a-botao--claro,
+.app.tema-escuro .a-botao--claro { background: var(--a-cinza-1); color: var(--a-texto) !important; }
+.app .a-botao--perigo,
+.app.tema-escuro .a-botao--perigo { background: var(--a-vermelho-fundo); color: var(--a-vermelho) !important; }
+.app .segmentado button.ativo,
+.app .chip.ativa,
+.app .marcadores button.ativo,
+.app .botao-util.ativo,
+.app.tema-escuro .segmentado button.ativo,
+.app.tema-escuro .chip.ativa,
+.app.tema-escuro .marcadores button.ativo,
+.app.tema-escuro .botao-util.ativo { background: var(--a-primaria); border-color: var(--a-primaria); color: var(--a-sobre-primaria) !important; }
+.app .alternador input:checked + i,
+.app.tema-escuro .alternador input:checked + i { background: var(--a-primaria); }
+.app .botao-redondo--escuro,
+.app.tema-escuro .botao-redondo--escuro { background: var(--a-primaria); color: var(--a-sobre-primaria) !important; }
+.app .busca__icone,
+.app.tema-escuro .busca__icone { background: var(--a-primaria); color: var(--a-sobre-primaria); }
+.app .item-posto.selecionado .item-posto__num,
+.app.tema-escuro .item-posto.selecionado .item-posto__num { background: var(--a-primaria); color: var(--a-sobre-primaria); }
+.app .estrelas-entrada button.ativa .ic { fill: var(--a-primaria); }
+.app .confirmacao input,
+.app .a-campo input[type="range"] { accent-color: var(--a-primaria); }
+
+/* Mapa: rota dourada com contorno preto */
+.app .m-rota-borda,
+.app.tema-escuro .m-rota-borda { stroke: var(--a-barra); }
+.app .m-rota,
+.app.tema-escuro .m-rota { stroke: var(--a-primaria); }
+.app .m-posto--selecionado .m-posto__corpo { fill: var(--a-primaria); stroke: var(--a-barra); }
+.app .m-posto--selecionado .m-posto__num { fill: var(--a-sobre-primaria); }
+.app .m-carro circle,
+.app.tema-escuro .m-carro circle { fill: var(--a-barra); stroke: var(--a-primaria); }
+.app .m-carro path,
+.app.tema-escuro .m-carro path { fill: var(--a-primaria); }
