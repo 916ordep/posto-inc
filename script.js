@@ -220,6 +220,7 @@
         tema: "claro", texto: "padrao", idioma: "pt",
         evitarAlerta: false, foraRota: true,
         notifPreco: true, notifAlerta: true, lembreteAvaliar: true,
+        valeAPena: true, // [vale-a-pena]
         nomePublico: true, localizacao: true
       },
       rotas: [
@@ -758,6 +759,7 @@
         a.maisBarato && (a.maisBaratoGeral && a.maisBaratoGeral.alerta === "grave" ? "sem alerta de adulteração" : `a ${fmtDistancia(a.maisBarato.restante)}`)) +
       card("ouro", "Mais bem avaliado", "estrela", a.melhor, a.melhor && fmt1.format(a.melhor.nota.media), a.melhor && `a ${fmtDistancia(a.melhor.restante)}`) +
       card("azul", "Carregador", "raio", a.carregador, a.carregador && `${a.carregador.posto.carregador} kW`, a.carregador && `a ${fmtDistancia(a.carregador.restante)}`);
+    renderValeAPenaFolha(); // [vale-a-pena]
   }
 
   function atualizarLista(a) {
@@ -1027,6 +1029,8 @@
             const v = precoDe(p, t);
             return `<div class="preco-item ${t === estado.combustivel ? "atual" : ""} ${v === null ? "preco-item--vazio" : ""}"><small>${combustiveis[t].nome}</small><b>${v === null ? "Indisponível" : fmtMoeda.format(v)}</b>${v === null ? "" : `<small>por ${combustiveis[t].unidade}</small>`}</div>`;
           }).join("")}</div>
+
+            ${secaoValeAPena(id) /* [vale-a-pena] */}
 
             <div class="a-secao">Serviços</div>
             <div class="servicos">
@@ -1479,6 +1483,145 @@
   // =========================================================
   // Configurações do aplicativo
   // =========================================================
+  // =========================================================
+  // [vale-a-pena] RECURSO "VALE A PENA IR?" — CUSTO REAL DO ABASTECIMENTO
+  // Para retirar: apague este bloco inteiro e as linhas marcadas com [vale-a-pena]
+  // (script.js, index.html e o bloco correspondente no style.css).
+  //
+  // Custo real = (quantidade × preço) + combustível gasto no desvio de ida e volta.
+  // Postos no caminho não têm desvio: o trecho até eles já faz parte da viagem.
+  // =========================================================
+
+  // Distância pelo mapa, em unidades, de vários pontos de partida até todos os pontos
+  function distanciasNoMapa(partidas) {
+    const d = {}, visitados = new Set();
+    Object.keys(pontos).forEach((k) => (d[k] = Infinity));
+    partidas.forEach((k) => (d[k] = 0));
+    for (;;) {
+      let atual = null;
+      for (const k in d) if (!visitados.has(k) && (atual === null || d[k] < d[atual])) atual = k;
+      if (atual === null || d[atual] === Infinity) break;
+      visitados.add(atual);
+      for (const { no, peso } of vizinhos[atual]) if (d[atual] + peso < d[no]) d[no] = d[atual] + peso;
+    }
+    return d;
+  }
+
+  function custosReais() {
+    if (!estado.rota.length) return [];
+    const consumo = consumoMedio();
+    const qtd = estado.litros;
+    // O desvio começa nos pontos da rota que ainda estão à frente do carro
+    const pos = pontoNaRota(estado.percorridoKm);
+    const partidas = estado.rota.slice(pos.indice).map((s) => s.para);
+    if (estado.percorridoKm <= 0) partidas.push(estado.rota[0].de);
+    const dist = distanciasNoMapa(partidas);
+    const noCaminho = new Map(estado.postosRota.map((item) => [item.posto.id, item]));
+
+    return postos.map((p) => {
+      const preco = precoDe(p, estado.combustivel);
+      if (preco === null) return null;
+      const item = noCaminho.get(p.id);
+      let desvioKm = 0, restante = null;
+      if (item) {
+        restante = item.km - estado.percorridoKm;
+        if (restante < -0.001) return null; // posto já ultrapassado
+      } else {
+        const e = estradas.find((x) => (x.u === p.u && x.v === p.v) || (x.u === p.v && x.v === p.u));
+        const ate = Math.min(dist[p.u] + p.t * e.comprimento, dist[p.v] + (1 - p.t) * e.comprimento);
+        desvioKm = 2 * ate * KM_POR_UNIDADE;
+      }
+      const abastecimento = qtd * preco;
+      const custoDesvio = (desvioKm / consumo) * preco;
+      return { posto: p, preco, naRota: !!item, restante, desvioKm, abastecimento, custoDesvio, total: abastecimento + custoDesvio, alerta: nivelAlerta(p) };
+    }).filter(Boolean).sort((x, y) => x.total - y.total);
+  }
+
+  function resumoValeAPena() {
+    const lista = custosReais();
+    const confiaveis = lista.filter((c) => c.alerta !== "grave");
+    const melhor = confiaveis[0];
+    if (!melhor) return null;
+    const maisBaratoLitro = [...confiaveis].sort((x, y) => x.preco - y.preco || x.total - y.total)[0];
+    const melhorNaRota = confiaveis.find((c) => c.naRota);
+    let mensagem;
+    if (maisBaratoLitro.posto.id !== melhor.posto.id) {
+      mensagem = `O ${esc(maisBaratoLitro.posto.nome)} tem o litro ${fmtMoeda.format(melhor.preco - maisBaratoLitro.preco)} mais barato, mas o desvio de ${fmtDistancia(maisBaratoLitro.desvioKm)} custa ${fmtMoeda.format(maisBaratoLitro.custoDesvio)}. <b>Não compensa.</b>`;
+    } else if (!melhor.naRota && melhorNaRota) {
+      mensagem = `<b>Compensa</b> desviar ${fmtDistancia(melhor.desvioKm)}: economia de ${fmtMoeda.format(melhorNaRota.total - melhor.total)} em relação ao ${esc(melhorNaRota.posto.nome)}, já contando o combustível do desvio.`;
+    } else {
+      mensagem = `O ${esc(melhor.posto.nome)} já é a opção mais econômica, sem sair do caminho.`;
+    }
+    return { lista, melhor, mensagem };
+  }
+
+  function renderValeAPenaFolha() {
+    const caixa = $("#vale-a-pena");
+    if (!caixa) return;
+    const r = dados.config.valeAPena ? resumoValeAPena() : null;
+    if (!r) { caixa.innerHTML = ""; return; }
+    caixa.innerHTML = `
+      <button type="button" class="vale-a-pena" data-acao="abrir-vale-a-pena">
+        <span class="vale-a-pena__topo">${ic("dinheiro")}<b>Vale a pena ir?</b>${ic("direita")}</span>
+        <span class="vale-a-pena__melhor">Melhor custo real: <b>${esc(r.melhor.posto.nome)}</b> · <b>${fmtMoeda.format(r.melhor.total)}</b> por ${estado.litros} ${unidade()}</span>
+        <span class="vale-a-pena__texto">${r.mensagem}</span>
+      </button>`;
+  }
+
+  function linhaCusto(c, melhor) {
+    const diferenca = c.total - melhor.total;
+    const selos = [
+      c.naRota ? '<span class="selo-app selo-app--verde">Na rota</span>' : `<span class="selo-app">Desvio de ${fmtDistancia(c.desvioKm)} ida e volta</span>`,
+      c === melhor ? '<span class="selo-app selo-app--ouro">Mais econômico</span>' : "",
+      seloAlerta(c.alerta)
+    ].join("");
+    return `<div class="custo-real ${c === melhor ? "custo-real--melhor" : ""}" data-acao="abrir-posto" data-id="${c.posto.id}" role="button" tabindex="0">
+      <div class="custo-real__topo"><b>${esc(c.posto.nome)}</b><span class="custo-real__total">${fmtMoeda.format(c.total)}</span></div>
+      <div class="item-posto__selos">${selos}</div>
+      <small>Abastecimento ${fmtMoeda.format(c.abastecimento)} (${fmtMoeda.format(c.preco)}/${unidade()}) + desvio ${fmtMoeda.format(c.custoDesvio)}${c === melhor ? "" : ` · ${fmtMoeda.format(diferenca)} a mais`}</small>
+    </div>`;
+  }
+
+  function painelValeAPena() {
+    return {
+      titulo: "Vale a pena ir?",
+      render() {
+        const r = resumoValeAPena();
+        if (!r) return { html: '<div class="vazio-app">Nenhum posto disponível para este combustível no trajeto.</div>' };
+        const unidadeConsumo = dados.carro.tipo === "eletrico" ? "km/kWh" : "km/L";
+        return {
+          html: `
+            <p class="a-texto-suave" style="margin-top:0">Um posto mais barato, mas fora do caminho, pode sair mais caro por causa do combustível gasto para chegar até ele. Aqui está o <b>custo real</b> de abastecer ${estado.litros} ${unidade()} de ${combustiveis[estado.combustivel].nome.toLowerCase()} em cada posto.</p>
+            <div class="vale-a-pena vale-a-pena--estatico"><span class="vale-a-pena__texto">${r.mensagem}</span></div>
+            <div class="a-secao">Custo real por posto</div>
+            ${r.lista.slice(0, 10).map((c) => linhaCusto(c, r.melhor)).join("")}
+            <p class="a-texto-suave" style="margin-top:14px">Custo real = abastecimento + combustível gasto no desvio de ida e volta. O trecho até os postos que já estão no seu caminho não entra na conta, porque você vai rodar esse caminho de qualquer forma. Consumo usado: ${fmt1.format(consumoMedio())} ${unidadeConsumo} (Meu carro).</p>`
+        };
+      }
+    };
+  }
+
+  function secaoValeAPena(id) {
+    if (!dados.config.valeAPena) return "";
+    const r = resumoValeAPena();
+    if (!r) return "";
+    const c = r.lista.find((x) => x.posto.id === id);
+    if (!c) return "";
+    const melhor = r.melhor;
+    const veredito = c.posto.id === melhor.posto.id
+      ? `<span class="selo-app selo-app--verde">${ic("check")}Melhor custo real da sua rota</span>`
+      : `<span class="selo-app selo-app--vermelho">${fmtMoeda.format(c.total - melhor.total)} a mais que o ${esc(melhor.posto.nome)}</span>`;
+    return `
+      <div class="a-secao">Vale a pena ir? <button type="button" data-acao="abrir-vale-a-pena">Ver comparação</button></div>
+      <dl class="conta-custo">
+        <div><dt>Abastecimento (${estado.litros} ${unidade()})</dt><dd>${fmtMoeda.format(c.abastecimento)}</dd></div>
+        <div><dt>Desvio${c.naRota ? " (no seu caminho)" : ` de ${fmtDistancia(c.desvioKm)} ida e volta`}</dt><dd>${fmtMoeda.format(c.custoDesvio)}</dd></div>
+        <div class="conta-custo__total"><dt>Custo real</dt><dd>${fmtMoeda.format(c.total)}</dd></div>
+      </dl>
+      ${veredito}`;
+  }
+  // [vale-a-pena] fim do recurso
+
   function painelConfig() {
     return {
       titulo: "Configurações",
@@ -1503,6 +1646,7 @@
               <h4>${ic("navegar")}Navegação</h4>
               ${alt("evitarAlerta", "Evitar postos com alerta de adulteração")}
               ${alt("foraRota", "Mostrar postos fora da rota no mapa")}
+              ${alt("valeAPena", "Comparar o custo real (Vale a pena ir?)") /* [vale-a-pena] */}
             </section>
             <section class="config-grupo">
               <h4>${ic("alerta")}Notificações</h4>
@@ -1636,6 +1780,12 @@
     ["Compartilhar localização durante a viagem", "Share location during trips", "Compartir ubicación durante el viaje"],
     ["Avaliações e reclamações de outros motoristas aparecem no idioma original.", "Reviews and complaints from other drivers appear in their original language.", "Las reseñas y reclamos de otros conductores aparecen en su idioma original."],
     ["Versão", "Version", "Versión"],
+    // [vale-a-pena]
+    ["Vale a pena ir?", "Is it worth it?", "¿Vale la pena ir?"], ["Melhor custo real", "Best real cost", "Mejor costo real"],
+    ["Custo real", "Real cost", "Costo real"], ["custo real", "real cost", "costo real"], ["Não compensa", "Not worth it", "No compensa"],
+    ["Compensa", "Worth it", "Compensa"], ["Ver comparação", "See comparison", "Ver comparación"],
+    ["Abastecimento", "Refueling", "Carga"], ["Desvio", "Detour", "Desvío"], ["ida e volta", "round trip", "ida y vuelta"],
+    ["Comparar o custo real (Vale a pena ir?)", "Compare the real cost (Is it worth it?)", "Comparar el costo real (¿Vale la pena ir?)"],
     ["Escolher foto", "Choose photo", "Elegir foto"], ["Trocar foto", "Change photo", "Cambiar foto"],
     ["Remover foto", "Remove photo", "Quitar foto"], ["Motorista anônimo", "Anonymous driver", "Conductor anónimo"],
     ["Preço confere com o app", "Price matches the app", "El precio coincide con la app"], ["Bom atendimento", "Good service", "Buena atención"],
@@ -1933,6 +2083,7 @@
     },
 
     "abrir-config": () => abrirPainel(painelConfig()),
+    "abrir-vale-a-pena": () => abrirPainel(painelValeAPena()), // [vale-a-pena]
     "config": (chave, valor) => {
       dados.config[chave] = valor;
       salvar(); aplicarConfig(); atualizarPainelAtual();

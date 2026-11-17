@@ -4224,3 +4224,27 @@ main:focus {
 .foto-perfil__botoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .foto-perfil__botoes .a-botao { padding: 10px 14px; font-size: .88rem; }
 .oculto { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+/* =========================================================
+   [vale-a-pena] Recurso "Vale a pena ir?" (custo real)
+   Para retirar, apague este bloco inteiro.
+   ========================================================= */
+.vale-a-pena { display: grid; gap: 6px; width: 100%; margin-bottom: 14px; padding: 12px 14px; border: 1px solid var(--a-ouro); border-radius: 12px; background: var(--a-ouro-fundo); text-align: left; }
+.vale-a-pena__topo { display: flex; align-items: center; gap: 8px; }
+.vale-a-pena__topo b { flex: 1; font-size: .95rem; }
+.vale-a-pena__topo .ic { width: 18px; height: 18px; color: var(--a-ouro-texto); }
+.vale-a-pena__melhor { font-size: .85rem; }
+.vale-a-pena__texto { font-size: .8rem; color: var(--a-suave); line-height: 1.4; }
+.vale-a-pena__texto b { color: var(--a-texto); }
+.vale-a-pena--estatico { cursor: default; margin-top: 4px; }
+.custo-real { display: grid; gap: 6px; padding: 12px 0; border-bottom: 1px solid var(--a-cinza-2); cursor: pointer; }
+.custo-real--melhor { margin: 0 -10px; padding-inline: 10px; border-radius: 10px; background: var(--a-verde-fundo); border-bottom-color: transparent; }
+.custo-real__topo { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.custo-real__total { font-weight: 800; font-size: 1.05rem; white-space: nowrap; }
+.custo-real small { color: var(--a-suave); font-size: .78rem; }
+.conta-custo { margin: 0 0 10px; padding: 4px 14px; border-radius: 12px; background: var(--a-cinza-1); }
+.conta-custo div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; font-size: .86rem; }
+.conta-custo div + div { border-top: 1px solid var(--a-cinza-2); }
+.conta-custo dt { color: var(--a-suave); }
+.conta-custo dd { margin: 0; font-weight: 600; white-space: nowrap; }
+.conta-custo__total dt, .conta-custo__total dd { color: var(--a-texto); font-weight: 800; }
