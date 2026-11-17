@@ -4315,3 +4315,62 @@ main:focus {
 .app.tema-escuro .m-carro circle { fill: var(--a-barra); stroke: var(--a-primaria); }
 .app .m-carro path,
 .app.tema-escuro .m-carro path { fill: var(--a-primaria); }
+
+/* =========================================================
+   Meu carro: busca de modelo e consumo identificado
+   ========================================================= */
+.busca-campo--carro { margin: 0; }
+.modelos { display: grid; gap: 6px; }
+.modelos:empty { display: none; }
+.modelo { display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 10px 12px; border: 1px solid var(--a-cinza-2); border-radius: 12px; background: var(--a-fundo); text-align: left; }
+.modelo:hover { border-color: var(--a-primaria); }
+.modelo b { display: block; font-size: .92rem; }
+.modelo small { display: block; color: var(--a-suave); font-size: .76rem; }
+.modelo__consumo { text-align: right; font-weight: 700; font-size: .9rem; white-space: nowrap; }
+.consumo-modelo { margin-bottom: 14px; padding: 14px; border-radius: 12px; background: var(--a-cinza-1); }
+.consumo-modelo__topo { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+.consumo-modelo__grade { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.consumo-modelo__grade small { display: block; color: var(--a-suave); font-size: .76rem; }
+.consumo-modelo__grade b { font-size: 1rem; }
+.consumo-modelo .a-texto-suave { margin: 10px 0 0; }
+.ajuste-manual { margin-bottom: 14px; }
+.ajuste-manual summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 600; font-size: .9rem; }
+.ajuste-manual[open] summary { margin-bottom: 8px; }
+
+/* =========================================================
+   Abertura do app: tela inicial do celular + animação com a logo
+   ========================================================= */
+.tela-inicial { position: absolute; inset: 50px 0 0; z-index: 55; display: flex; flex-direction: column; align-items: center; padding: 56px 24px 44px; background: radial-gradient(circle at 30% 15%, #3b3112, #0d0d0d 62%); color: #f2f2f2; text-align: center; }
+.tela-inicial[hidden], .abertura-app[hidden] { display: none; }
+.tela-inicial__hora { font-family: var(--fonte-app); font-size: 4.4rem; font-weight: 300; line-height: 1; letter-spacing: -.02em; }
+.tela-inicial__data { margin-top: 8px; color: #cfcfcf; font-size: .95rem; }
+.tela-inicial__apps { margin-top: auto; display: grid; justify-items: center; gap: 14px; }
+.icone-abrir { display: grid; justify-items: center; gap: 8px; padding: 8px; border: 0; border-radius: 24px; background: none; color: #f2f2f2 !important; cursor: pointer; }
+.icone-abrir img { width: 80px; height: 80px; animation: icone-chama 2.4s ease-in-out infinite; }
+.icone-abrir span { font-size: .85rem; font-weight: 500; }
+.icone-abrir:hover img { transform: scale(1.06); }
+.tela-inicial__dica { margin: 0; color: #bdbdbd; font-size: .85rem; }
+@keyframes icone-chama { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+.abertura-app { position: absolute; inset: 0; z-index: 70; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; background: #c9a227; transform-origin: var(--ox, 50%) var(--oy, 80%); }
+.abertura-app img { width: 230px; max-width: 70%; opacity: 0; }
+.abertura-app__barra { position: relative; width: 120px; height: 4px; overflow: hidden; border-radius: 4px; background: rgba(13, 13, 13, .2); opacity: 0; }
+.abertura-app__barra::after { content: ""; position: absolute; inset: 0; width: 40%; border-radius: 4px; background: #0d0d0d; animation: carregar 1s ease-in-out infinite; }
+.abertura-app.abrindo { animation: app-expande .5s cubic-bezier(.2, .8, .2, 1) both; }
+.abertura-app.abrindo img { animation: logo-entra .7s .4s cubic-bezier(.2, .8, .2, 1) both; }
+.abertura-app.abrindo .abertura-app__barra { animation: surgir .4s .9s ease-out both; }
+.abertura-app.saindo { animation: app-some .38s ease both; }
+@keyframes app-expande {
+  from { clip-path: circle(40px at var(--ox, 50%) var(--oy, 80%)); }
+  to { clip-path: circle(150% at var(--ox, 50%) var(--oy, 80%)); }
+}
+@keyframes logo-entra {
+  from { opacity: 0; transform: translateY(16px) scale(.9); }
+  60% { opacity: 1; transform: translateY(-3px) scale(1.03); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes app-some { to { opacity: 0; transform: scale(1.04); } }
+
+/* As camadas internas do celular (tela inicial, abertura, painéis) ficam isoladas
+   e nunca passam por cima do cabeçalho fixo do site */
+.celular { isolation: isolate; }

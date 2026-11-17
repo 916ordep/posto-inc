@@ -503,7 +503,7 @@
               <use href="#i-carro" />
             </svg>
             <h3>Meu carro</h3>
-            <p>Cadastro do veículo, do tanque e do consumo médio para estimar o custo da viagem.</p>
+            <p>Busca do modelo do carro: o app identifica o veículo e preenche o consumo e o tanque.</p>
           </article>
           <article class="cartao cartao--icone"><svg class="ic">
               <use href="#i-atividade" />
@@ -799,6 +799,23 @@
                 </nav>
 
                 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+                <!-- Tela inicial do celular: tocar no ícone abre o app com a animação da logo -->
+                <div class="tela-inicial" id="tela-inicial">
+                  <span class="tela-inicial__hora" aria-hidden="true">9:41</span>
+                  <span class="tela-inicial__data" aria-hidden="true"></span>
+                  <div class="tela-inicial__apps">
+                    <button type="button" class="icone-abrir" id="abrir-app" aria-label="Abrir o aplicativo Posto Inc.">
+                      <img src="img/icone-posto-inc.png" alt="">
+                      <span>Posto Inc.</span>
+                    </button>
+                    <p class="tela-inicial__dica">Toque no ícone para abrir</p>
+                  </div>
+                </div>
+                <div class="abertura-app" id="abertura-app" hidden aria-hidden="true">
+                  <img src="img/logo-posto-inc-preto.png" alt="">
+                  <span class="abertura-app__barra"></span>
+                </div>
                 <div class="dialogo" id="dialogo" hidden>
                   <div class="dialogo__caixa" role="alertdialog" aria-modal="true" aria-labelledby="dialogo-titulo"
                     id="dialogo-conteudo"></div>
@@ -824,8 +841,8 @@
                   repete no dia a dia.</span></li>
               <li data-acao="atividade"><b>Consumo de combustível</b><span>Registre abastecimentos e acompanhe o consumo
                   real e o gasto do mês.</span></li>
-              <li data-acao="carro"><b>Perfil e meu carro</b><span>Cadastre o veículo, o tanque e o consumo médio para
-                  estimar o custo da viagem.</span></li>
+              <li data-acao="carro"><b>Perfil e meu carro</b><span>Busque o modelo do seu carro: o app identifica o veículo
+                  e preenche o consumo e o tanque automaticamente.</span></li>
               <li data-acao="config"><b>Configurações</b><span>Ative o modo escuro, troque o idioma (português, inglês
                   ou
                   espanhol), aumente o texto e escolha as notificações.</span></li>
@@ -833,6 +850,9 @@
             <button type="button" class="botao" id="btn-ampliar"><svg class="ic">
                 <use href="#i-ampliar" />
               </svg>Ampliar protótipo</button>
+            <button type="button" class="botao botao--contorno" id="btn-fechar-app"><svg class="ic">
+                <use href="#i-reiniciar" />
+              </svg>Fechar o app e abrir de novo</button>
           </div>
         </div>
       </div>
@@ -870,6 +890,8 @@
               <li>Integração com serviço de mapas e geolocalização (GPS) do celular.</li>
               <li>Preços obtidos de fontes públicas, como o levantamento da ANP, e confirmados pela comunidade.</li>
               <li>Banco de dados em nuvem para usuários, veículos, postos, preços e avaliações.</li>
+              <li>Catálogo de modelos com o consumo oficial da tabela do Programa Brasileiro de Etiquetagem Veicular
+                (Inmetro).</li>
               <li>Moderação das avaliações e sistema de reputação para evitar abusos.</li>
             </ul>
           </div>

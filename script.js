@@ -160,6 +160,38 @@
     atendimento: "Agradecemos o retorno. Reforçamos a equipe nos horários de maior movimento."
   };
 
+  // ---------- Catálogo de modelos de carro (consumo aproximado, em km/L ou km/kWh) ----------
+  // gas = gasolina [cidade, estrada] · eta = etanol [cidade, estrada] · ele = elétrico [cidade, estrada]
+  const MODELOS_CARRO = [
+    { id: "fiat-mobi",       marca: "Fiat",       nome: "Mobi 1.0",              ano: 2025, tipo: "flex",     tanque: 47, gas: [13.5, 14.6], eta: [9.5, 10.3] },
+    { id: "fiat-argo",       marca: "Fiat",       nome: "Argo 1.0",              ano: 2025, tipo: "flex",     tanque: 48, gas: [13.3, 14.9], eta: [9.2, 10.5] },
+    { id: "fiat-strada",     marca: "Fiat",       nome: "Strada 1.3",            ano: 2025, tipo: "flex",     tanque: 55, gas: [12.0, 13.4], eta: [8.4, 9.4] },
+    { id: "chevrolet-onix",  marca: "Chevrolet",  nome: "Onix 1.0",              ano: 2025, tipo: "flex",     tanque: 44, gas: [13.9, 16.9], eta: [9.6, 11.8] },
+    { id: "chevrolet-tracker", marca: "Chevrolet", nome: "Tracker 1.0 Turbo",    ano: 2025, tipo: "flex",     tanque: 44, gas: [11.6, 13.8], eta: [8.0, 9.6] },
+    { id: "vw-polo",         marca: "Volkswagen", nome: "Polo 1.0",              ano: 2025, tipo: "flex",     tanque: 52, gas: [13.2, 15.5], eta: [9.2, 10.9] },
+    { id: "vw-tcross",       marca: "Volkswagen", nome: "T-Cross 1.0 TSI",       ano: 2025, tipo: "flex",     tanque: 52, gas: [11.0, 13.5], eta: [7.7, 9.4] },
+    { id: "hyundai-hb20",    marca: "Hyundai",    nome: "HB20 1.0",              ano: 2025, tipo: "flex",     tanque: 50, gas: [13.3, 15.1], eta: [9.3, 10.6] },
+    { id: "hyundai-creta",   marca: "Hyundai",    nome: "Creta 1.0 Turbo",       ano: 2025, tipo: "flex",     tanque: 50, gas: [11.3, 13.2], eta: [7.9, 9.3] },
+    { id: "renault-kwid",    marca: "Renault",    nome: "Kwid 1.0",              ano: 2025, tipo: "flex",     tanque: 38, gas: [14.9, 15.6], eta: [10.3, 10.8] },
+    { id: "toyota-corolla",  marca: "Toyota",     nome: "Corolla 2.0",           ano: 2025, tipo: "flex",     tanque: 50, gas: [11.7, 13.6], eta: [8.2, 9.5] },
+    { id: "toyota-cross-hib", marca: "Toyota",    nome: "Corolla Cross Híbrido", ano: 2025, tipo: "hibrido",  tanque: 36, gas: [17.8, 14.9] },
+    { id: "jeep-renegade",   marca: "Jeep",       nome: "Renegade 1.3 Turbo",    ano: 2025, tipo: "flex",     tanque: 55, gas: [10.6, 12.1], eta: [7.4, 8.5] },
+    { id: "toyota-hilux",    marca: "Toyota",     nome: "Hilux 2.8 Diesel",      ano: 2025, tipo: "diesel",   tanque: 80, gas: [8.9, 10.7] },
+    { id: "byd-dolphin",     marca: "BYD",        nome: "Dolphin",               ano: 2025, tipo: "eletrico", tanque: 44.9, ele: [6.4, 5.6] },
+    { id: "renault-kwid-e",  marca: "Renault",    nome: "Kwid E-Tech",           ano: 2025, tipo: "eletrico", tanque: 26.8, ele: [7.6, 6.6] }
+  ];
+  const nomeModelo = (m) => `${m.marca} ${m.nome}`;
+
+  // Converte um modelo do catálogo nos dados usados pelo app
+  function carroDoModelo(m) {
+    const principal = m.ele || m.gas;
+    return {
+      modeloId: m.id, modelo: nomeModelo(m), ano: m.ano, tipo: m.tipo, tanque: m.tanque,
+      consumoCidade: principal[0], consumoEstrada: principal[1],
+      etanolCidade: m.eta ? m.eta[0] : "", etanolEstrada: m.eta ? m.eta[1] : ""
+    };
+  }
+
   function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
 
   function precoDe(posto, tipo) {
@@ -213,7 +245,7 @@
   function dadosIniciais() {
     return {
       perfil: { nome: "Usuário", foto: "", cidade: "Cidade Exemplo", uf: "RJ", membroDesde: "março de 2026" },
-      carro: { modelo: "Hatch 1.0 Flex", ano: 2022, tipo: "flex", tanque: 47, consumoCidade: 12.1, consumoEstrada: 14.3 },
+      carro: carroDoModelo(MODELOS_CARRO[7]),
       favoritos: [8, 4],
       reclamacoes: [],
       config: {
@@ -648,7 +680,14 @@
     return { lista, aFrente, maisBarato, maisBaratoGeral, graves, melhor, maisCaro, carregador };
   }
 
-  const consumoMedio = () => (Number(dados.carro.consumoCidade) + Number(dados.carro.consumoEstrada)) / 2 || 10;
+  // Consumo médio do carro para o combustível escolhido (no flex, o etanol tem consumo próprio)
+  const consumoMedio = () => {
+    const c = dados.carro;
+    if (estado.combustivel === "etanol" && Number(c.etanolCidade) && Number(c.etanolEstrada)) {
+      return (Number(c.etanolCidade) + Number(c.etanolEstrada)) / 2;
+    }
+    return (Number(c.consumoCidade) + Number(c.consumoEstrada)) / 2 || 10;
+  };
   const unidade = () => combustiveis[estado.combustivel].unidade;
 
   // =========================================================
@@ -1336,29 +1375,79 @@
       render() {
         const f = estado.form;
         const eletrico = f.tipo === "eletrico";
+        const un = eletrico ? "km/kWh" : "km/L";
         const autonomia = Number(f.tanque) * ((Number(f.consumoCidade) + Number(f.consumoEstrada)) / 2);
+        const doCatalogo = MODELOS_CARRO.some((m) => m.id === f.modeloId);
         return {
           html: `
             <div class="cartao-carro">${ic("carro")}<div><b>${esc(f.modelo || "Seu carro")}</b><small>${tiposCarro[f.tipo].nome} · ${esc(f.ano)} · autonomia estimada de ${Number.isFinite(autonomia) ? Math.round(autonomia) : "—"} km</small></div></div>
-            <div class="a-linha a-linha--modelo">
-              <div class="a-campo"><label for="c-modelo">Modelo</label><input id="c-modelo" data-campo="modelo" value="${esc(f.modelo)}" maxlength="40"></div>
-              <div class="a-campo"><label for="c-ano">Ano</label><input id="c-ano" data-campo="ano" type="number" min="1980" max="2027" value="${esc(f.ano)}"></div>
+
+            <div class="a-campo">
+              <label for="c-busca">Buscar o modelo do seu carro</label>
+              <label class="busca-campo busca-campo--carro">${ic("busca")}<input id="c-busca" type="search" placeholder="Ex.: Onix, HB20, Corolla" autocomplete="off"></label>
+              <div class="modelos" id="c-modelos" role="listbox" aria-label="Modelos encontrados"></div>
             </div>
-            <div class="a-campo"><span>Tipo de combustível</span>
-              <div class="segmentado">${Object.entries(tiposCarro).map(([k, t]) => `<button type="button" class="${k === f.tipo ? "ativo" : ""}" data-acao="form-tipo-carro" data-valor="${k}">${t.nome}</button>`).join("")}</div>
+
+            <div class="consumo-modelo">
+              <div class="consumo-modelo__topo"><b>Consumo ${doCatalogo ? "do modelo" : "informado"}</b>${doCatalogo ? `<span class="selo-app selo-app--verde">${ic("check")}Modelo identificado</span>` : ""}</div>
+              <div class="consumo-modelo__grade">
+                <div><small>${eletrico ? "Elétrico" : "Gasolina"} · cidade</small><b>${fmt1.format(Number(f.consumoCidade) || 0)} ${un}</b></div>
+                <div><small>${eletrico ? "Elétrico" : "Gasolina"} · estrada</small><b>${fmt1.format(Number(f.consumoEstrada) || 0)} ${un}</b></div>
+                ${Number(f.etanolCidade) ? `
+                <div><small>Etanol · cidade</small><b>${fmt1.format(Number(f.etanolCidade))} km/L</b></div>
+                <div><small>Etanol · estrada</small><b>${fmt1.format(Number(f.etanolEstrada))} km/L</b></div>` : ""}
+                <div><small>${eletrico ? "Bateria" : "Tanque"}</small><b>${fmt1.format(Number(f.tanque) || 0)} ${eletrico ? "kWh" : "L"}</b></div>
+              </div>
+              ${doCatalogo ? '<p class="a-texto-suave">Consumo aproximado do modelo. Você pode ajustar abaixo.</p>' : ""}
             </div>
-            <div class="a-campo"><label for="c-tanque">${eletrico ? "Capacidade da bateria (kWh)" : "Capacidade do tanque (L)"}</label><input id="c-tanque" data-campo="tanque" type="number" min="1" max="200" value="${esc(f.tanque)}"></div>
-            <div class="a-linha">
-              <div class="a-campo"><label for="c-cidade">Consumo na cidade</label><input id="c-cidade" data-campo="consumoCidade" type="number" step="0.1" min="1" value="${esc(f.consumoCidade)}"><small>${eletrico ? "km/kWh" : "km/L"}</small></div>
-              <div class="a-campo"><label for="c-estrada">Consumo na estrada</label><input id="c-estrada" data-campo="consumoEstrada" type="number" step="0.1" min="1" value="${esc(f.consumoEstrada)}"><small>${eletrico ? "km/kWh" : "km/L"}</small></div>
-            </div>
+
+            <details class="ajuste-manual" ${f._manualAberto ? "open" : ""}>
+              <summary>Ajustar os dados manualmente</summary>
+              <div class="a-linha a-linha--modelo">
+                <div class="a-campo"><label for="c-modelo">Modelo</label><input id="c-modelo" data-campo="modelo" value="${esc(f.modelo)}" maxlength="40"></div>
+                <div class="a-campo"><label for="c-ano">Ano</label><input id="c-ano" data-campo="ano" type="number" min="1980" max="2027" value="${esc(f.ano)}"></div>
+              </div>
+              <div class="a-campo"><span>Tipo de combustível</span>
+                <div class="segmentado">${Object.entries(tiposCarro).map(([k, t]) => `<button type="button" class="${k === f.tipo ? "ativo" : ""}" data-acao="form-tipo-carro" data-valor="${k}">${t.nome}</button>`).join("")}</div>
+              </div>
+              <div class="a-campo"><label for="c-tanque">${eletrico ? "Capacidade da bateria (kWh)" : "Capacidade do tanque (L)"}</label><input id="c-tanque" data-campo="tanque" type="number" min="1" max="200" value="${esc(f.tanque)}"></div>
+              <div class="a-linha">
+                <div class="a-campo"><label for="c-cidade">${eletrico ? "Consumo" : "Gasolina"} na cidade</label><input id="c-cidade" data-campo="consumoCidade" type="number" step="0.1" min="1" value="${esc(f.consumoCidade)}"><small>${un}</small></div>
+                <div class="a-campo"><label for="c-estrada">${eletrico ? "Consumo" : "Gasolina"} na estrada</label><input id="c-estrada" data-campo="consumoEstrada" type="number" step="0.1" min="1" value="${esc(f.consumoEstrada)}"><small>${un}</small></div>
+              </div>
+              ${f.tipo === "flex" ? `
+              <div class="a-linha">
+                <div class="a-campo"><label for="c-eta-cidade">Etanol na cidade</label><input id="c-eta-cidade" data-campo="etanolCidade" type="number" step="0.1" min="1" value="${esc(f.etanolCidade)}"><small>km/L</small></div>
+                <div class="a-campo"><label for="c-eta-estrada">Etanol na estrada</label><input id="c-eta-estrada" data-campo="etanolEstrada" type="number" step="0.1" min="1" value="${esc(f.etanolEstrada)}"><small>km/L</small></div>
+              </div>` : ""}
+            </details>
             <div class="dica">${ic("info")}<span>O consumo é usado para estimar o custo de cada viagem e para escolher os combustíveis exibidos na comparação.</span></div>`,
           rodape: `<button type="button" class="a-botao a-botao--bloco" data-acao="salvar-carro">Salvar carro</button>`
         };
       },
       aoMontar(raiz) {
-        $$("input[data-campo]", raiz).forEach((i) => i.addEventListener("input", () => (estado.form[i.dataset.campo] = i.value)));
+        $$("input[data-campo]", raiz).forEach((i) => i.addEventListener("input", () => {
+          estado.form[i.dataset.campo] = i.value;
+          // Editar algum dado à mão desfaz a identificação automática do modelo
+          estado.form.modeloId = "";
+        }));
         $$("input[data-campo]", raiz).forEach((i) => i.addEventListener("change", atualizarPainelAtual));
+        $(".ajuste-manual", raiz).addEventListener("toggle", (ev) => (estado.form._manualAberto = ev.target.open));
+        const busca = $("#c-busca", raiz);
+        const listar = () => {
+          const termo = busca.value.trim().toLowerCase();
+          const achados = termo
+            ? MODELOS_CARRO.filter((m) => nomeModelo(m).toLowerCase().includes(termo)).slice(0, 6)
+            : [];
+          $("#c-modelos", raiz).innerHTML = !termo ? ""
+            : achados.length ? achados.map((m) => `
+              <button type="button" class="modelo" role="option" data-acao="escolher-modelo" data-id="${m.id}">
+                <span><b>${esc(nomeModelo(m))}</b><small>${tiposCarro[m.tipo].nome} · ${m.ano}</small></span>
+                <span class="modelo__consumo">${fmt1.format((m.ele || m.gas)[0])} ${m.ele ? "km/kWh" : "km/L"}<small>na cidade</small></span>
+              </button>`).join("")
+            : '<p class="vazio-app">Modelo não encontrado. Use “Ajustar os dados manualmente”.</p>';
+        };
+        busca.addEventListener("input", listar);
       }
     };
   }
@@ -1786,6 +1875,12 @@
     ["Compensa", "Worth it", "Compensa"], ["Ver comparação", "See comparison", "Ver comparación"],
     ["Abastecimento", "Refueling", "Carga"], ["Desvio", "Detour", "Desvío"], ["ida e volta", "round trip", "ida y vuelta"],
     ["Comparar o custo real (Vale a pena ir?)", "Compare the real cost (Is it worth it?)", "Comparar el costo real (¿Vale la pena ir?)"],
+    ["Buscar o modelo do seu carro", "Search for your car model", "Buscar el modelo de tu auto"],
+    ["Modelo identificado", "Model identified", "Modelo identificado"], ["Consumo do modelo", "Model consumption", "Consumo del modelo"],
+    ["Consumo informado", "Entered consumption", "Consumo informado"], ["Ajustar os dados manualmente", "Adjust the data manually", "Ajustar los datos manualmente"],
+    ["Consumo aproximado do modelo. Você pode ajustar abaixo.", "Approximate consumption for this model. You can adjust it below.", "Consumo aproximado del modelo. Puedes ajustarlo abajo."],
+    ["Gasolina", "Gasoline", "Gasolina"], ["na cidade", "in the city", "en la ciudad"],
+    ["Toque no ícone para abrir", "Tap the icon to open", "Toca el ícono para abrir"],
     ["Escolher foto", "Choose photo", "Elegir foto"], ["Trocar foto", "Change photo", "Cambiar foto"],
     ["Remover foto", "Remove photo", "Quitar foto"], ["Motorista anônimo", "Anonymous driver", "Conductor anónimo"],
     ["Preço confere com o app", "Price matches the app", "El precio coincide con la app"], ["Bom atendimento", "Good service", "Buena atención"],
@@ -2144,12 +2239,24 @@
     },
     "remover-avaliacao": (id) => { dados.avaliacoes = dados.avaliacoes.filter((a) => a.id !== id); salvar(); atualizarPainelAtual(); atualizarTudo(true); mostrarToast("Avaliação excluída."); },
 
-    "form-tipo-carro": (_, v) => { estado.form.tipo = v; atualizarPainelAtual(); },
+    "form-tipo-carro": (_, v) => { estado.form.tipo = v; estado.form.modeloId = ""; atualizarPainelAtual(); },
+    "escolher-modelo": (id) => {
+      const m = MODELOS_CARRO.find((x) => x.id === id);
+      if (!m) return;
+      estado.form = { ...estado.form, ...carroDoModelo(m) };
+      atualizarPainelAtual();
+      mostrarToast(`${nomeModelo(m)} identificado. Consumo preenchido automaticamente.`);
+    },
     "salvar-carro": () => {
       const f = estado.form;
       if (!String(f.modelo).trim()) { mostrarToast("Informe o modelo do carro."); return; }
-      const { placa: _placaAntiga, ...carroSemPlaca } = f;
-      dados.carro = { ...carroSemPlaca, modelo: String(f.modelo).trim(), ano: Number(f.ano), tanque: Number(f.tanque) || 1, consumoCidade: Number(f.consumoCidade) || 1, consumoEstrada: Number(f.consumoEstrada) || 1 };
+      const { placa: _placaAntiga, _manualAberto, ...carroSemPlaca } = f;
+      const flex = f.tipo === "flex";
+      dados.carro = {
+        ...carroSemPlaca, modelo: String(f.modelo).trim(), ano: Number(f.ano), tanque: Number(f.tanque) || 1,
+        consumoCidade: Number(f.consumoCidade) || 1, consumoEstrada: Number(f.consumoEstrada) || 1,
+        etanolCidade: flex ? Number(f.etanolCidade) || "" : "", etanolEstrada: flex ? Number(f.etanolEstrada) || "" : ""
+      };
       const combs = tiposCarro[dados.carro.tipo].combustiveis;
       if (!combs.includes(estado.combustivel)) estado.combustivel = combs[0];
       filtroEletrico.checked = dados.carro.tipo === "eletrico";
@@ -2278,9 +2385,14 @@
       salvar(); atualizarTudo(true);
     });
 
+    // Abertura do app: tocar no ícone da tela inicial
+    $("#abrir-app").addEventListener("click", abrirApp);
+    $("#btn-fechar-app").addEventListener("click", fecharApp);
+
     // Roteiro ao lado do celular
     $$(".roteiro li").forEach((li) => li.addEventListener("click", () => {
       $$(".roteiro li").forEach((x) => x.classList.toggle("ativo", x === li));
+      if (!appAberto) abrirApp(); // se o app estiver fechado, abre com a animação
       const acao = li.dataset.acao;
       if (acao === "inicio") { mostrarVista("inicio"); folha.classList.remove("expandida"); }
       else if (acao === "posto") { mostrarVista("inicio"); const a = analisar(); const d = a.maisBarato || a.lista[0]; if (d) abrirPainel(painelPosto(d.posto.id)); }
@@ -2320,8 +2432,50 @@
   // =========================================================
   // Inicialização
   // =========================================================
+  // =========================================================
+  // Abertura do app: o ícone se expande, a tela fica dourada e a logo aparece
+  // =========================================================
+  let appAberto = false;
+  function abrirApp() {
+    if (appAberto) return;
+    appAberto = true;
+    const abertura = $("#abertura-app");
+    const caixaApp = app.getBoundingClientRect();
+    const icone = $("#abrir-app img").getBoundingClientRect();
+    // A expansão começa exatamente onde está o ícone
+    abertura.style.setProperty("--ox", `${((icone.left + icone.width / 2 - caixaApp.left) / caixaApp.width) * 100}%`);
+    abertura.style.setProperty("--oy", `${((icone.top + icone.height / 2 - caixaApp.top) / caixaApp.height) * 100}%`);
+    abertura.hidden = false;
+    abertura.classList.remove("saindo");
+    void abertura.offsetWidth; // reinicia a animação
+    abertura.classList.add("abrindo");
+    const rapido = reduzirMovimento();
+    setTimeout(() => {
+      $("#tela-inicial").hidden = true;
+      abertura.classList.add("saindo");
+      setTimeout(() => {
+        abertura.hidden = true;
+        abertura.classList.remove("abrindo", "saindo");
+      }, rapido ? 50 : 380);
+    }, rapido ? 300 : 1800);
+  }
+
+  function fecharApp() {
+    pararViagem();
+    fecharDialogo();
+    mostrarVista("inicio");
+    folha.classList.remove("expandida");
+    $("#tela-inicial").hidden = false;
+    appAberto = false;
+    $$(".roteiro li").forEach((x) => x.classList.remove("ativo"));
+  }
+
   function atualizarHora() {
-    $(".app__hora").textContent = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    const agora = new Date();
+    $(".app__hora").textContent = agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    $(".tela-inicial__hora").textContent = agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    const data = agora.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
+    $(".tela-inicial__data").textContent = data.charAt(0).toUpperCase() + data.slice(1);
   }
 
   $$(".ano-atual").forEach((s) => (s.textContent = new Date().getFullYear()));
